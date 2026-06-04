@@ -147,18 +147,17 @@
 
   /* ─── HERO ─── */
   #hero {
-    position: relative; height: 100vh; min-height: 700px;
+    position: relative; height: 100vh; min-height: 650px;
     display: flex; align-items: center; overflow: hidden;
   }
   .hero-bg {
-    position: absolute; inset: 0;
+    position: absolute;
+    inset: 0;
     background-image: url('hero.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    transform: scale(1.05);
-    transition: transform 0.1s linear;
-  }
+}
   .hero-overlay {
     position: absolute;
     inset: 0;
@@ -170,18 +169,6 @@
         rgba(5,6,7,0.55) 100%
     );
 }
-  .hero-scan {
-    position: absolute; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--blue-glow), var(--orange), transparent);
-    animation: scanline 4s ease-in-out infinite;
-    opacity: 0.4;
-  }
-  @keyframes scanline {
-    0% { top: -2px; opacity: 0; }
-    10% { opacity: 0.4; }
-    90% { opacity: 0.4; }
-    100% { top: 100%; opacity: 0; }
-  }
 
   /* Hero HUD elements */
   .hero-hud {
@@ -972,8 +959,6 @@
 <section id="hero">
   <div class="hero-bg"></div>
   <div class="hero-overlay"></div>
-  <div class="hero-grid-overlay"></div>
-  <div class="hero-scan"></div>
 
   <div class="hero-content">
     <div class="hero-eyebrow">
