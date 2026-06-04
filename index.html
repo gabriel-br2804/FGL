@@ -529,13 +529,38 @@
     font-family: var(--font-display); font-size: 20px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
   }
-  .solution-text { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; }
+  .solution-text {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
+
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+
+  transition: all .4s ease;
+}
+
+.solution-card.open .solution-text {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 12px;
+}
   .solution-arrow {
-    position: absolute; bottom: 24px; right: 28px;
-    font-family: var(--font-mono); font-size: 18px; color: var(--orange);
-    opacity: 0; transform: translateX(-10px);
-    transition: opacity 0.3s, transform 0.3s;
-  }
+  position: absolute;
+  bottom: 24px;
+  right: 28px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--orange;
+
+  opacity: 0;
+  transition: .3s;
+}
+
+.solution-card.open .solution-arrow {
+  opacity: 1;
+}
   .solution-card:hover .solution-arrow { opacity: 1; transform: translateX(0); }
   @media(max-width:900px){ .solutions-grid { grid-template-columns: 1fr 1fr; } }
   @media(max-width:600px){ .solutions-grid { grid-template-columns: 1fr; } }
@@ -686,7 +711,6 @@
     background-position: center;
     background-repeat: no-repeat;
     transition: transform 0.5s ease;
-}
   }
   .market-card:hover .market-card-bg { transform: scale(1.05); }
   .market-card-overlay {
@@ -1051,7 +1075,7 @@
       <h2 class="section-title">O que<br><em>Entregamos</em></h2>
     </div>
     <div class="solutions-grid">
-      <div class="solution-card reveal">
+     <div class="solution-card reveal" onclick="this.classList.toggle('open')">
         <span class="solution-card-num">01</span>
         <div class="solution-icon">
           <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -1060,7 +1084,7 @@
         <p class="solution-text">Voos técnicos programados para inspeção sistemática de perímetros, estruturas e áreas críticas com documentação visual de alta resolução.</p>
         <div class="solution-arrow">→</div>
       </div>
-      <div class="solution-card reveal">
+     <div class="solution-card reveal" onclick="this.classList.toggle('open')">
         <span class="solution-card-num">02</span>
         <div class="solution-icon">
           <svg viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
@@ -1069,7 +1093,7 @@
         <p class="solution-text">Coleta, processamento e análise de dados aéreos para geração de inteligência operacional que subsidia tomadas de decisão estratégicas.</p>
         <div class="solution-arrow">→</div>
       </div>
-      <div class="solution-card reveal">
+      <div class="solution-card reveal" onclick="this.classList.toggle('open')">
         <span class="solution-card-num">03</span>
         <div class="solution-icon">
           <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -1078,7 +1102,7 @@
         <p class="solution-text">Mapeamento aéreo completo de pontos críticos, falhas de estrutura e vulnerabilidades perimetrais com relatórios técnicos detalhados.</p>
         <div class="solution-arrow">→</div>
       </div>
-      <div class="solution-card reveal">
+      <div class="solution-card reveal" onclick="this.classList.toggle('open')">
         <span class="solution-card-num">04</span>
         <div class="solution-icon">
           <svg viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
@@ -1087,7 +1111,7 @@
         <p class="solution-text">Plataforma de inteligência aérea integrada às equipes de proteção, ampliando capacidade de análise e resposta a eventos com dados em tempo real.</p>
         <div class="solution-arrow">→</div>
       </div>
-      <div class="solution-card reveal">
+     <div class="solution-card reveal" onclick="this.classList.toggle('open')">
         <span class="solution-card-num">05</span>
         <div class="solution-icon">
           <svg viewBox="0 0 24 24" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
@@ -1096,7 +1120,7 @@
         <p class="solution-text">Acionamento rápido para inspeção visual aérea de eventos, ocorrências e situações críticas, fornecendo contexto visual imediato aos gestores.</p>
         <div class="solution-arrow">→</div>
       </div>
-      <div class="solution-card reveal">
+      <div class="solution-card reveal" onclick="this.classList.toggle('open')">
         <span class="solution-card-num">06</span>
         <div class="solution-icon">
           <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
