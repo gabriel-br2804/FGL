@@ -679,9 +679,14 @@
     position: relative; overflow: hidden; cursor: pointer;
     aspect-ratio: 4/3; background: var(--graphite);
   }
-  .market-card-bg {
-    position: absolute; inset: 0; background: var(--graphite2);
+ .market-card-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     transition: transform 0.5s ease;
+}
   }
   .market-card:hover .market-card-bg { transform: scale(1.05); }
   .market-card-overlay {
@@ -1270,7 +1275,7 @@
   </div>
   <div class="markets-grid">
     <div class="market-card reveal">
-      <div class="market-card-bg" style="background: linear-gradient(135deg, #0a1628, #1a2a4a);"></div>
+      <div class="market-card-bg" style="background-image:url('condominios.png');"></div>
       <div class="market-card-overlay"></div>
       <div class="market-pattern"></div>
       <div class="market-card-num">01</div>
@@ -1281,7 +1286,7 @@
       </div>
     </div>
     <div class="market-card reveal">
-      <div class="market-card-bg" style="background: linear-gradient(135deg, #1a0a08, #3a1a10);"></div>
+     <div class="market-card-bg" style="background-image:url('logistica.png');"></div>
       <div class="market-card-overlay"></div>
       <div class="market-pattern"></div>
       <div class="market-card-num">02</div>
@@ -1292,7 +1297,7 @@
       </div>
     </div>
     <div class="market-card reveal">
-      <div class="market-card-bg" style="background: linear-gradient(135deg, #0a1a0a, #1a3a1a);"></div>
+      <div class="market-card-bg" style="background-image:url('industria.png');"></div>
       <div class="market-card-overlay"></div>
       <div class="market-pattern"></div>
       <div class="market-card-num">03</div>
@@ -1303,7 +1308,7 @@
       </div>
     </div>
     <div class="market-card reveal">
-      <div class="market-card-bg" style="background: linear-gradient(135deg, #0f1a08, #2a3a10);"></div>
+      <div class="market-card-bg" style="background-image:url('fazenda.png');"></div>
       <div class="market-card-overlay"></div>
       <div class="market-pattern"></div>
       <div class="market-card-num">04</div>
@@ -1314,7 +1319,7 @@
       </div>
     </div>
     <div class="market-card reveal">
-      <div class="market-card-bg" style="background: linear-gradient(135deg, #1a1a0a, #3a2a10);"></div>
+      <div class="market-card-bg" style="background-image:url('solar.png');"></div>
       <div class="market-card-overlay"></div>
       <div class="market-pattern"></div>
       <div class="market-card-num">05</div>
@@ -1325,7 +1330,7 @@
       </div>
     </div>
     <div class="market-card reveal">
-      <div class="market-card-bg" style="background: linear-gradient(135deg, #0a0a1a, #1a1a3a);"></div>
+      <div class="market-card-bg" style="background-image:url('infraestrutura.png');"></div>
       <div class="market-card-overlay"></div>
       <div class="market-pattern"></div>
       <div class="market-card-num">06</div>
