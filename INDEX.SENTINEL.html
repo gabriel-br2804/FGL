@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FGL Sentinel | Inteligência Aérea Aplicada à Proteção Patrimonial</title>
+<meta name="description" content="FGL Sentinel — Inteligência operacional aérea de alto padrão. Inspeção aérea inteligente, análise de áreas críticas e relatórios estratégicos para proteção patrimonial.">
+<meta name="keywords" content="inteligência aérea, drone, inspeção aérea, proteção patrimonial, inteligência operacional, análise visual, FGL Sentinel">
+<meta property="og:title" content="FGL Sentinel | Inteligência Aérea">
+<meta property="og:description" content="Visão Além do Alcance. Inteligência Aérea Aplicada à Proteção Patrimonial.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --black: #050607;
+    --dark: #0a0c0f;
+    --dark2: #0f1218;
+    --graphite: #1a1e26;
+    --graphite2: #252a35;
+    --blue-deep: #0b1a2e;
+    --blue-tech: #0d2444;
+    --blue-accent: #1a4a8a;
+    --blue-glow: #2563eb;
+    --blue-light: #3b82f6;
+    --orange: #f97316;
+    --orange-deep: #ea580c;
+    --orange-glow: #fb923c;
+    --white: #ffffff;
+    --white-dim: rgba(255,255,255,0.85);
+    --white-faint: rgba(255,255,255,0.12);
+    --white-ghost: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.08);
+    --border-orange: rgba(249,115,22,0.3);
+    --border-blue: rgba(37,99,235,0.3);
+    --font-display: 'Barlow Condensed', sans-serif;
+    --font-body: 'Barlow', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  ::selection { background: var(--orange); color: var(--black); }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 2px; }
+
+  /* ─── UTILITY ─── */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
+  @media(max-width:768px){ .container{ padding: 0 20px; } }
+
+  .tag-line {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 3px;
+    color: var(--orange); text-transform: uppercase; margin-bottom: 16px;
+  }
+  .tag-line::before { content: ''; width: 24px; height: 1px; background: var(--orange); }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+  }
+
+  /* ─── NAVIGATION ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+    padding: 0 40px;
+    transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+  nav.scrolled {
+    background: rgba(5,6,7,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom-color: var(--border);
+  }
+  .nav-inner {
+    max-width: 1280px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 72px;
+  }
+  .nav-logo img { height: 36px; width: auto; }
+  .nav-links {
+    display: flex; align-items: center; gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7);
+    text-decoration: none; transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+    height: 1px; background: var(--orange); transform: scaleX(0); transition: transform 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+  .nav-cta {
+    font-family: var(--font-display); font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--black) !important;
+    background: var(--orange); padding: 10px 20px; border-radius: 2px;
+    text-decoration: none; transition: background 0.2s, transform 0.2s;
+  }
+  .nav-cta:hover { background: var(--orange-glow); transform: translateY(-1px); }
+  .nav-cta::after { display: none !important; }
+  .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+  .nav-hamburger span { width: 22px; height: 2px; background: var(--white); transition: 0.3s; }
+
+  @media(max-width:1024px){ .nav-links { display: none; } }
+  @media(max-width:768px){
+    nav { padding: 0 20px; }
+    .nav-hamburger { display: flex; }
+  }
+
+  /* ─── MOBILE MENU ─── */
+  .mobile-menu {
+    display: none; position: fixed; inset: 0; z-index: 800;
+    background: rgba(5,6,7,0.98); backdrop-filter: blur(20px);
+    flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-family: var(--font-display); font-size: 28px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase; color: var(--white);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .mobile-menu a:hover { color: var(--orange); }
+
+  /* ─── HERO ─── */
+  #hero {
+    position: relative; height: 100vh; min-height: 700px;
+    display: flex; align-items: center; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background-image: url('img/hero.jpg');
+    background-size: cover; background-position: center;
+    transform: scale(1.05);
+    transition: transform 0.1s linear;
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(5,6,7,0.92) 0%,
+      rgba(11,26,46,0.75) 40%,
+      rgba(5,6,7,0.6) 70%,
+      rgba(5,6,7,0.85) 100%
+    );
+  }
+  .hero-grid-overlay {
+    position: absolute; inset: 0; opacity: 0.06;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.8) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.8) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-scan {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--blue-glow), var(--orange), transparent);
+    animation: scanline 4s ease-in-out infinite;
+    opacity: 0.4;
+  }
+  @keyframes scanline {
+    0% { top: -2px; opacity: 0; }
+    10% { opacity: 0.4; }
+    90% { opacity: 0.4; }
+    100% { top: 100%; opacity: 0; }
+  }
+  .hero-content {
+    position: relative; z-index: 10;
+    max-width: 1280px; margin: 0 auto; padding: 0 40px;
+    width: 100%;
+  }
+  .hero-eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 4px;
+    color: var(--orange); text-transform: uppercase;
+    display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+  .hero-eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--orange); }
+  .hero-eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--orange);
+    animation: pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(249,115,22,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(249,115,22,0); }
+  }
+  .hero-title {
+    font-family: var(--font-display); font-size: clamp(64px, 10vw, 130px);
+    font-weight: 900; line-height: 0.88; text-transform: uppercase;
+    letter-spacing: -2px; margin-bottom: 8px;
+    opacity: 0; transform: translateY(30px);
+    animation: fadeUp 0.9s 0.5s forwards;
+  }
+  .hero-title span { color: var(--orange); }
+  .hero-subtitle {
+    font-family: var(--font-display); font-size: clamp(28px, 4vw, 52px);
+    font-weight: 300; letter-spacing: 8px; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); margin-bottom: 32px;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp 0.9s 0.7s forwards;
+  }
+  .hero-desc {
+    font-size: 17px; color: rgba(255,255,255,0.7); max-width: 520px;
+    line-height: 1.7; margin-bottom: 48px;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp 0.9s 0.9s forwards;
+  }
+  .hero-btns {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp 0.9s 1.1s forwards;
+  }
+  .btn-primary {
+    font-family: var(--font-display); font-size: 13px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: var(--orange); color: var(--black);
+    padding: 16px 36px; border: none; cursor: pointer;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    transition: background 0.2s, transform 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--orange-glow); transform: translateY(-2px); }
+  .btn-secondary {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--white);
+    padding: 15px 36px; border: 1px solid rgba(255,255,255,0.3); cursor: pointer;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    background: transparent; transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-secondary:hover {
+    border-color: var(--orange); background: rgba(249,115,22,0.08);
+    transform: translateY(-2px);
+  }
+  .hero-stats {
+    position: absolute; bottom: 60px; right: 40px;
+    display: flex; gap: 40px; z-index: 10;
+    opacity: 0; animation: fadeUp 0.9s 1.4s forwards;
+  }
+  .hero-stat { text-align: right; }
+  .hero-stat-num {
+    font-family: var(--font-display); font-size: 36px; font-weight: 800;
+    color: var(--orange); line-height: 1;
+  }
+  .hero-stat-label {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
+    color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 4px;
+  }
+  .scroll-indicator {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    z-index: 10; opacity: 0; animation: fadeUp 0.9s 1.6s forwards;
+  }
+  .scroll-indicator span {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 3px;
+    color: rgba(255,255,255,0.3); text-transform: uppercase;
+  }
+  .scroll-line { width: 1px; height: 40px; background: rgba(255,255,255,0.2); position: relative; overflow: hidden; }
+  .scroll-line::after {
+    content: ''; position: absolute; top: -100%; left: 0; right: 0; height: 100%;
+    background: linear-gradient(var(--orange), transparent);
+    animation: scrollDown 1.5s ease-in-out infinite;
+  }
+  @keyframes scrollDown { 0% { top: -100%; } 100% { top: 100%; } }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── REVEAL ANIMATIONS ─── */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-left {
+    opacity: 0; transform: translateX(-40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right {
+    opacity: 0; transform: translateX(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  /* ─── SECTION BASE ─── */
+  section { position: relative; overflow: hidden; }
+
+  .section-header { margin-bottom: 60px; }
+  .section-title {
+    font-family: var(--font-display); font-size: clamp(40px, 5vw, 72px);
+    font-weight: 900; text-transform: uppercase; line-height: 0.9; letter-spacing: -1px;
+  }
+  .section-title em { font-style: normal; color: var(--orange); }
+  .section-body {
+    font-size: 16px; color: rgba(255,255,255,0.6); max-width: 600px;
+    line-height: 1.8; margin-top: 20px;
+  }
+
+  /* ─── TICKER ─── */
+  .ticker-wrap {
+    background: var(--orange); overflow: hidden; padding: 12px 0; position: relative; z-index: 10;
+  }
+  .ticker-inner {
+    display: flex; gap: 0; white-space: nowrap;
+    animation: ticker 30s linear infinite;
+  }
+  .ticker-item {
+    font-family: var(--font-display); font-size: 12px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase; color: var(--black);
+    padding: 0 48px; display: flex; align-items: center; gap: 16px;
+  }
+  .ticker-item::after { content: '◆'; font-size: 8px; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* ─── ABOUT ─── */
+  #about {
+    padding: 120px 0;
+    background: var(--dark);
+  }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  }
+  .about-image-wrap {
+    position: relative;
+  }
+  .about-image-wrap img {
+    width: 100%; border-radius: 2px; display: block;
+    filter: saturate(0.9) contrast(1.05);
+  }
+  .about-image-wrap::before {
+    content: ''; position: absolute; inset: -1px;
+    border: 1px solid var(--orange); opacity: 0.3; z-index: 1;
+    pointer-events: none;
+  }
+  .about-image-corner {
+    position: absolute; z-index: 2;
+    width: 20px; height: 20px;
+  }
+  .about-image-corner.tl { top: -4px; left: -4px; border-top: 2px solid var(--orange); border-left: 2px solid var(--orange); }
+  .about-image-corner.tr { top: -4px; right: -4px; border-top: 2px solid var(--orange); border-right: 2px solid var(--orange); }
+  .about-image-corner.bl { bottom: -4px; left: -4px; border-bottom: 2px solid var(--orange); border-left: 2px solid var(--orange); }
+  .about-image-corner.br { bottom: -4px; right: -4px; border-bottom: 2px solid var(--orange); border-right: 2px solid var(--orange); }
+  .about-badge {
+    position: absolute; bottom: 24px; right: 24px; z-index: 3;
+    background: rgba(5,6,7,0.92); border: 1px solid var(--border-orange);
+    padding: 16px 20px; backdrop-filter: blur(10px);
+  }
+  .about-badge-num {
+    font-family: var(--font-display); font-size: 36px; font-weight: 900; color: var(--orange); line-height: 1;
+  }
+  .about-badge-text {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
+    color: rgba(255,255,255,0.5); text-transform: uppercase; margin-top: 4px;
+  }
+  .about-highlights {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px;
+  }
+  .about-highlight {
+    background: var(--white-ghost); border: 1px solid var(--border);
+    padding: 20px; border-left: 2px solid var(--orange);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .about-highlight:hover { background: rgba(249,115,22,0.06); border-color: var(--orange); }
+  .about-highlight-title {
+    font-family: var(--font-display); font-size: 14px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--white); margin-bottom: 6px;
+  }
+  .about-highlight-text { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+  @media(max-width:900px){ .about-grid { grid-template-columns: 1fr; gap: 40px; } }
+
+  /* ─── SOLUTIONS ─── */
+  #solutions { padding: 120px 0; background: var(--black); }
+  .solutions-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  }
+  .solution-card {
+    position: relative; padding: 40px 36px;
+    background: var(--graphite); border: 1px solid var(--border);
+    overflow: hidden; cursor: pointer;
+    transition: background 0.3s, border-color 0.3s;
+    group: true;
+  }
+  .solution-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(249,115,22,0.06), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .solution-card:hover { background: var(--graphite2); border-color: var(--border-orange); }
+  .solution-card:hover::before { opacity: 1; }
+  .solution-card-num {
+    font-family: var(--font-mono); font-size: 11px; color: var(--orange);
+    letter-spacing: 2px; margin-bottom: 20px; display: block;
+  }
+  .solution-icon {
+    width: 48px; height: 48px; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(249,115,22,0.1); border: 1px solid var(--border-orange);
+    transition: background 0.3s;
+  }
+  .solution-card:hover .solution-icon { background: rgba(249,115,22,0.2); }
+  .solution-icon svg { width: 22px; height: 22px; stroke: var(--orange); fill: none; }
+  .solution-title {
+    font-family: var(--font-display); font-size: 20px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+  }
+  .solution-text { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; }
+  .solution-arrow {
+    position: absolute; bottom: 24px; right: 28px;
+    font-family: var(--font-mono); font-size: 18px; color: var(--orange);
+    opacity: 0; transform: translateX(-10px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .solution-card:hover .solution-arrow { opacity: 1; transform: translateX(0); }
+
+  @media(max-width:900px){ .solutions-grid { grid-template-columns: 1fr 1fr; } }
+  @media(max-width:600px){ .solutions-grid { grid-template-columns: 1fr; } }
+
+  /* ─── AI SECTION ─── */
+  #ai {
+    padding: 140px 0; background: var(--dark);
+    position: relative;
+  }
+  .ai-bg-accent {
+    position: absolute; top: 0; right: 0;
+    width: 60%; height: 100%; opacity: 0.12;
+    background: radial-gradient(ellipse at right, var(--blue-glow), transparent 70%);
+    pointer-events: none;
+  }
+  .ai-layout {
+    display: grid; grid-template-columns: 1fr 1.1fr; gap: 80px; align-items: center;
+  }
+  .ai-image-wrap { position: relative; }
+  .ai-image-wrap img { width: 100%; border-radius: 2px; display: block; }
+  .ai-image-wrap::after {
+    content: ''; position: absolute; inset: 0;
+    border: 1px solid rgba(37,99,235,0.4);
+    pointer-events: none;
+  }
+  .ai-detection-tags {
+    position: absolute; inset: 0; pointer-events: none;
+  }
+  .ai-tag {
+    position: absolute;
+    background: rgba(5,6,7,0.85); border: 1px solid var(--orange);
+    padding: 6px 10px; backdrop-filter: blur(8px);
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; color: var(--orange);
+    animation: tagPulse 3s ease-in-out infinite;
+    white-space: nowrap;
+  }
+  .ai-tag:nth-child(2) { animation-delay: 1s; }
+  .ai-tag:nth-child(3) { animation-delay: 2s; }
+  @keyframes tagPulse {
+    0%, 100% { border-color: var(--orange); box-shadow: 0 0 0 0 rgba(249,115,22,0.2); }
+    50% { border-color: var(--orange-glow); box-shadow: 0 0 12px rgba(249,115,22,0.3); }
+  }
+  .ai-features {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px;
+  }
+  .ai-feature {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 16px; background: var(--white-ghost); border: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+  .ai-feature:hover { border-color: var(--border-blue); }
+  .ai-feature-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--orange);
+    flex-shrink: 0; margin-top: 5px;
+  }
+  .ai-feature-text {
+    font-family: var(--font-display); font-size: 14px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  @media(max-width:900px){ .ai-layout { grid-template-columns: 1fr; gap: 40px; } }
+
+  /* ─── TECHNOLOGY ─── */
+  #technology { padding: 140px 0; background: var(--black); }
+  .tech-hero-image {
+    position: relative; width: 100%; margin-bottom: 80px;
+    overflow: hidden;
+  }
+  .tech-hero-image img {
+    width: 100%; max-height: 500px; object-fit: cover;
+    object-position: center;
+    filter: saturate(0.85);
+  }
+  .tech-hero-image::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top, var(--black) 0%, transparent 40%, transparent 60%, var(--black) 100%);
+  }
+  .tech-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+  }
+  @media(max-width:900px){ .tech-grid { grid-template-columns: 1fr 1fr; } }
+  @media(max-width:500px){ .tech-grid { grid-template-columns: 1fr; } }
+  .tech-item {
+    padding: 32px 28px; background: var(--graphite); border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .tech-item::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: var(--orange); transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+  .tech-item:hover { background: var(--graphite2); border-color: var(--border-orange); }
+  .tech-item:hover::after { transform: scaleX(1); }
+  .tech-item-icon {
+    font-size: 28px; margin-bottom: 16px;
+    filter: grayscale(0.3);
+  }
+  .tech-item-title {
+    font-family: var(--font-display); font-size: 16px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .tech-item-text { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; }
+
+  /* ─── HOW IT WORKS ─── */
+  #how { padding: 140px 0; background: var(--dark); }
+  .timeline {
+    position: relative; max-width: 800px; margin: 0 auto;
+  }
+  .timeline::before {
+    content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+    width: 1px; background: linear-gradient(to bottom, transparent, var(--orange), transparent);
+    transform: translateX(-50%);
+  }
+  .timeline-step {
+    display: flex; align-items: center; margin-bottom: 60px; position: relative;
+  }
+  .timeline-step:nth-child(odd) { flex-direction: row-reverse; }
+  .timeline-step:nth-child(odd) .timeline-content { text-align: right; }
+  .timeline-dot {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    width: 48px; height: 48px; background: var(--black); border: 2px solid var(--orange);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1;
+    font-family: var(--font-mono); font-size: 11px; color: var(--orange);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+  .timeline-content { width: calc(50% - 48px); padding: 0 40px; }
+  .timeline-title {
+    font-family: var(--font-display); font-size: 22px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 2px; color: var(--white); margin-bottom: 8px;
+  }
+  .timeline-text { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+  @media(max-width:700px){
+    .timeline::before { left: 20px; }
+    .timeline-step, .timeline-step:nth-child(odd) { flex-direction: row; }
+    .timeline-step:nth-child(odd) .timeline-content { text-align: left; }
+    .timeline-dot { left: 20px; width: 36px; height: 36px; }
+    .timeline-content { width: auto; padding: 0 0 0 60px; }
+  }
+
+  /* ─── MARKETS ─── */
+  #markets { padding: 140px 0; background: var(--black); }
+  .markets-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  }
+  .market-card {
+    position: relative; overflow: hidden; cursor: pointer;
+    aspect-ratio: 4/3;
+    background: var(--graphite);
+  }
+  .market-card-bg {
+    position: absolute; inset: 0;
+    background: var(--graphite2);
+    transition: transform 0.5s ease;
+  }
+  .market-card:hover .market-card-bg { transform: scale(1.05); }
+  .market-card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(5,6,7,0.9) 0%, rgba(5,6,7,0.3) 60%, transparent 100%);
+  }
+  .market-card-content {
+    position: absolute; bottom: 0; left: 0; right: 0; padding: 28px;
+    transition: transform 0.3s;
+  }
+  .market-card-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+  .market-card-title {
+    font-family: var(--font-display); font-size: 22px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 2px;
+  }
+  .market-card-text {
+    font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 8px;
+    max-height: 0; overflow: hidden; transition: max-height 0.4s, opacity 0.3s;
+    opacity: 0;
+  }
+  .market-card:hover .market-card-text { max-height: 80px; opacity: 1; }
+  .market-pattern {
+    position: absolute; inset: 0; opacity: 0.05;
+    background-image: repeating-linear-gradient(
+      45deg, var(--orange), var(--orange) 1px, transparent 1px, transparent 20px
+    );
+    transition: opacity 0.3s;
+  }
+  .market-card:hover .market-pattern { opacity: 0.08; }
+  .market-card-num {
+    position: absolute; top: 20px; right: 20px;
+    font-family: var(--font-mono); font-size: 10px; color: rgba(249,115,22,0.5); letter-spacing: 2px;
+  }
+
+  @media(max-width:900px){ .markets-grid { grid-template-columns: 1fr 1fr; } }
+  @media(max-width:600px){ .markets-grid { grid-template-columns: 1fr; } }
+
+  /* ─── DASHBOARD / REPORTS ─── */
+  #reports { padding: 140px 0; background: var(--dark); }
+  .reports-headline {
+    font-family: var(--font-display); font-size: clamp(32px, 4vw, 56px);
+    font-weight: 900; text-transform: uppercase; line-height: 1; letter-spacing: -1px;
+    text-align: center; margin-bottom: 80px;
+  }
+  .reports-headline em { font-style: normal; color: var(--orange); }
+  .dashboard-wrap {
+    background: var(--graphite); border: 1px solid var(--border);
+    padding: 2px; position: relative;
+  }
+  .dashboard-wrap::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--orange), var(--blue-glow), transparent);
+    opacity: 0.15; pointer-events: none;
+  }
+  .dashboard-inner { background: var(--dark2); padding: 32px; }
+  .dashboard-header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 28px;
+  }
+  .dashboard-title {
+    font-family: var(--font-mono); font-size: 11px; color: var(--orange); letter-spacing: 3px;
+  }
+  .dashboard-status {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 2px;
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+    animation: pulse-dot 2s infinite;
+  }
+  .metrics-row {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px;
+  }
+  @media(max-width:700px){ .metrics-row { grid-template-columns: 1fr 1fr; } }
+  .metric-card {
+    background: var(--white-ghost); border: 1px solid var(--border); padding: 20px 16px;
+    text-align: center;
+  }
+  .metric-value {
+    font-family: var(--font-display); font-size: 32px; font-weight: 900; color: var(--orange);
+    line-height: 1;
+  }
+  .metric-value.blue { color: var(--blue-light); }
+  .metric-label {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
+    color: rgba(255,255,255,0.35); text-transform: uppercase; margin-top: 6px;
+  }
+  .bars-wrap {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+  }
+  @media(max-width:700px){ .bars-wrap { grid-template-columns: 1fr; } }
+  .bar-chart { }
+  .bar-chart-title {
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .bar-label { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); width: 80px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; background: var(--orange); width: 0; transition: width 1.2s ease; }
+  .bar-fill.blue { background: var(--blue-light); }
+  .bar-val { font-family: var(--font-mono); font-size: 10px; color: var(--orange); width: 30px; text-align: right; flex-shrink: 0; }
+
+  /* ─── VISION ─── */
+  #vision {
+    padding: 180px 0; text-align: center; position: relative;
+    background: var(--black);
+  }
+  .vision-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(37,99,235,0.08) 0%, transparent 70%);
+  }
+  .vision-quote {
+    font-family: var(--font-display); font-size: clamp(28px, 4vw, 54px);
+    font-weight: 900; text-transform: uppercase; line-height: 1.1; letter-spacing: -1px;
+    max-width: 900px; margin: 0 auto 40px;
+    position: relative; z-index: 1;
+  }
+  .vision-quote em { font-style: normal; color: var(--orange); }
+  .vision-divider {
+    width: 60px; height: 2px; background: var(--orange); margin: 0 auto 24px;
+  }
+  .vision-sub {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 4px;
+    color: rgba(255,255,255,0.3); text-transform: uppercase; position: relative; z-index: 1;
+  }
+
+  /* ─── CONTACT ─── */
+  #contact { padding: 140px 0; background: var(--dark); }
+  .contact-layout {
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; align-items: start;
+  }
+  .contact-info-title {
+    font-family: var(--font-display); font-size: 48px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: -1px; line-height: 1;
+    margin-bottom: 20px;
+  }
+  .contact-info-title em { font-style: normal; color: var(--orange); }
+  .contact-info-text { font-size: 15px; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 40px; }
+  .contact-detail {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 20px; padding: 16px;
+    border: 1px solid var(--border); background: var(--white-ghost);
+  }
+  .contact-detail-icon {
+    width: 40px; height: 40px; background: rgba(249,115,22,0.1); border: 1px solid var(--border-orange);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    font-size: 16px;
+  }
+  .contact-detail-text { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 3px;
+    color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 8px;
+  }
+  .form-input, .form-textarea {
+    width: 100%; background: var(--white-ghost); border: 1px solid var(--border);
+    color: var(--white); font-family: var(--font-body); font-size: 14px;
+    padding: 14px 16px; outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    border-radius: 0;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-textarea:focus {
+    border-color: var(--orange); background: rgba(249,115,22,0.04);
+  }
+  .form-textarea { resize: vertical; min-height: 120px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:500px){ .form-row { grid-template-columns: 1fr; } }
+
+  @media(max-width:900px){ .contact-layout { grid-template-columns: 1fr; gap: 40px; } }
+
+  /* ─── WHATSAPP FLOAT ─── */
+  .whatsapp-float {
+    position: fixed; bottom: 32px; right: 32px; z-index: 950;
+    width: 60px; height: 60px;
+    background: #25d366; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 24px rgba(37,211,102,0.4);
+    animation: whatsappBounce 3s ease-in-out infinite;
+    text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .whatsapp-float:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 32px rgba(37,211,102,0.6);
+    animation: none;
+  }
+  .whatsapp-float svg { width: 30px; height: 30px; fill: white; }
+  @keyframes whatsappBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.04); }
+  }
+  .whatsapp-tooltip {
+    position: absolute; right: 70px; top: 50%; transform: translateY(-50%);
+    background: rgba(5,6,7,0.9); color: white; font-family: var(--font-display);
+    font-size: 12px; font-weight: 600; letter-spacing: 1px; white-space: nowrap;
+    padding: 8px 14px; border: 1px solid var(--border);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .whatsapp-float:hover .whatsapp-tooltip { opacity: 1; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--dark2); border-top: 1px solid var(--border);
+    padding: 60px 0 0;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+    padding-bottom: 48px; border-bottom: 1px solid var(--border);
+  }
+  @media(max-width:900px){ .footer-grid { grid-template-columns: 1fr 1fr; } }
+  @media(max-width:600px){ .footer-grid { grid-template-columns: 1fr; } }
+  .footer-logo img { height: 30px; margin-bottom: 16px; }
+  .footer-tagline { font-size: 13px; color: rgba(255,255,255,0.35); line-height: 1.6; max-width: 260px; }
+  .footer-col-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--orange);
+    margin-bottom: 20px;
+  }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 10px; }
+  .footer-links a {
+    font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--white); }
+  .footer-socials { display: flex; gap: 12px; margin-top: 24px; }
+  .footer-social {
+    width: 36px; height: 36px; background: var(--white-ghost); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.4); text-decoration: none; font-size: 14px;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .footer-social:hover { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.08); }
+  .footer-bottom {
+    padding: 20px 0; display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .footer-copy { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.2); }
+  .footer-legal { display: flex; gap: 24px; }
+  .footer-legal a { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,0.2); text-decoration: none; }
+  .footer-legal a:hover { color: rgba(255,255,255,0.5); }
+
+  /* ─── SEPARATOR ─── */
+  .separator {
+    display: flex; align-items: center; gap: 16px; margin: 40px 0;
+  }
+  .separator-line { flex: 1; height: 1px; background: var(--border); }
+  .separator-icon { color: var(--orange); font-size: 10px; letter-spacing: 4px; font-family: var(--font-mono); }
+
+  /* ─── GLOWING LINES ─── */
+  .glow-line-h {
+    position: absolute; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--orange), transparent);
+    opacity: 0.2;
+  }
+  .glow-line-v {
+    position: absolute; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(180deg, transparent, var(--blue-glow), transparent);
+    opacity: 0.15;
+  }
+
+  /* counter animation */
+  .counter { display: inline-block; }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <img src="img/logo.png" alt="FGL Sentinel" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <div style="display:none; align-items:center; gap:8px;">
+        <span style="font-family:var(--font-display); font-size:22px; font-weight:900; letter-spacing:2px; color:var(--orange);">FGL</span>
+        <span style="font-family:var(--font-display); font-size:22px; font-weight:900; letter-spacing:3px; color:var(--white);">SENTINEL</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">Quem Somos</a></li>
+      <li><a href="#solutions">Soluções</a></li>
+      <li><a href="#ai">Inteligência</a></li>
+      <li><a href="#technology">Tecnologia</a></li>
+      <li><a href="#markets">Mercados</a></li>
+      <li><a href="#contact" class="nav-cta">Falar com Especialista</a></li>
+    </ul>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="toggleMenu()">Quem Somos</a>
+  <a href="#solutions" onclick="toggleMenu()">Soluções</a>
+  <a href="#ai" onclick="toggleMenu()">Inteligência</a>
+  <a href="#technology" onclick="toggleMenu()">Tecnologia</a>
+  <a href="#markets" onclick="toggleMenu()">Mercados</a>
+  <a href="#contact" onclick="toggleMenu()" style="color:var(--orange);">Falar com Especialista</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-grid-overlay"></div>
+  <div class="hero-scan"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="dot"></div>
+      Sistema Ativo — Operação em Tempo Real
+    </div>
+    <h1 class="hero-title">FGL<br><span>Sentinel</span></h1>
+    <div class="hero-subtitle">Visão Além do Alcance</div>
+    <p class="hero-desc">Inteligência Aérea Aplicada à Proteção Patrimonial. Transformamos dados em decisões, imagens em inteligência.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Solicitar Apresentação</a>
+      <a href="https://wa.me/5511999999999" target="_blank" class="btn-secondary">Falar com Especialista</a>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num"><span class="counter" data-target="500">0</span>+</div>
+      <div class="hero-stat-label">Horas de Voo</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num"><span class="counter" data-target="98">0</span>%</div>
+      <div class="hero-stat-label">Precisão IA</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num"><span class="counter" data-target="40">0</span>+</div>
+      <div class="hero-stat-label">Clientes</div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner">
+    <div class="ticker-item">Inteligência Aérea</div>
+    <div class="ticker-item">Inspeção Inteligente</div>
+    <div class="ticker-item">Análise de Áreas Críticas</div>
+    <div class="ticker-item">Relatórios Estratégicos</div>
+    <div class="ticker-item">Identificação de Vulnerabilidades</div>
+    <div class="ticker-item">Resposta Visual a Eventos</div>
+    <div class="ticker-item">Apoio Tecnológico</div>
+    <div class="ticker-item">Dados Operacionais</div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item">Inteligência Aérea</div>
+    <div class="ticker-item">Inspeção Inteligente</div>
+    <div class="ticker-item">Análise de Áreas Críticas</div>
+    <div class="ticker-item">Relatórios Estratégicos</div>
+    <div class="ticker-item">Identificação de Vulnerabilidades</div>
+    <div class="ticker-item">Resposta Visual a Eventos</div>
+    <div class="ticker-item">Apoio Tecnológico</div>
+    <div class="ticker-item">Dados Operacionais</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="reveal-left">
+        <div class="about-image-wrap">
+          <img src="img/command.jpg" alt="Central de Operações FGL Sentinel">
+          <div class="about-image-corner tl"></div>
+          <div class="about-image-corner tr"></div>
+          <div class="about-image-corner bl"></div>
+          <div class="about-image-corner br"></div>
+          <div class="about-badge">
+            <div class="about-badge-num">24/7</div>
+            <div class="about-badge-text">Capacidade Operacional</div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <div class="tag-line">Quem Somos</div>
+        <h2 class="section-title">Inteligência<br><em>Operacional</em><br>Aérea</h2>
+        <p class="section-body">A FGL Sentinel utiliza tecnologia aérea avançada para ampliar a capacidade de análise, inspeção e inteligência operacional em patrimônios, condomínios e grandes áreas. Não somos uma empresa de segurança — somos uma plataforma de inteligência aérea que transforma dados em decisões estratégicas.</p>
+        <div class="about-highlights">
+          <div class="about-highlight reveal">
+            <div class="about-highlight-title">Inteligência Operacional</div>
+            <div class="about-highlight-text">Dados aéreos convertidos em inteligência acionável</div>
+          </div>
+          <div class="about-highlight reveal">
+            <div class="about-highlight-title">Tecnologia Aplicada</div>
+            <div class="about-highlight-text">Sensores, câmeras e IA de última geração</div>
+          </div>
+          <div class="about-highlight reveal">
+            <div class="about-highlight-title">Dados Estratégicos</div>
+            <div class="about-highlight-text">Relatórios que fundamentam decisões críticas</div>
+          </div>
+          <div class="about-highlight reveal">
+            <div class="about-highlight-title">Análise Visual</div>
+            <div class="about-highlight-text">Interpretação técnica de imagens aéreas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTIONS -->
+<section id="solutions">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag-line">Nossas Soluções</div>
+      <h2 class="section-title">O que<br><em>Entregamos</em></h2>
+    </div>
+    <div class="solutions-grid">
+      <div class="solution-card reveal">
+        <span class="solution-card-num">01</span>
+        <div class="solution-icon">
+          <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="solution-title">Inspeção Aérea Inteligente</div>
+        <p class="solution-text">Voos técnicos programados para inspeção sistemática de perímetros, estruturas e áreas críticas com documentação visual de alta resolução.</p>
+        <div class="solution-arrow">→</div>
+      </div>
+      <div class="solution-card reveal">
+        <span class="solution-card-num">02</span>
+        <div class="solution-icon">
+          <svg viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <div class="solution-title">Inteligência Operacional</div>
+        <p class="solution-text">Coleta, processamento e análise de dados aéreos para geração de inteligência operacional que subsidia tomadas de decisão estratégicas.</p>
+        <div class="solution-arrow">→</div>
+      </div>
+      <div class="solution-card reveal">
+        <span class="solution-card-num">03</span>
+        <div class="solution-icon">
+          <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="solution-title">Identificação de Vulnerabilidades</div>
+        <p class="solution-text">Mapeamento aéreo completo de pontos críticos, falhas de estrutura e vulnerabilidades perimetrais com relatórios técnicos detalhados.</p>
+        <div class="solution-arrow">→</div>
+      </div>
+      <div class="solution-card reveal">
+        <span class="solution-card-num">04</span>
+        <div class="solution-icon">
+          <svg viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div class="solution-title">Apoio Tecnológico às Equipes</div>
+        <p class="solution-text">Plataforma de inteligência aérea integrada às equipes de proteção, ampliando capacidade de análise e resposta a eventos com dados em tempo real.</p>
+        <div class="solution-arrow">→</div>
+      </div>
+      <div class="solution-card reveal">
+        <span class="solution-card-num">05</span>
+        <div class="solution-icon">
+          <svg viewBox="0 0 24 24" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        </div>
+        <div class="solution-title">Resposta Visual a Eventos</div>
+        <p class="solution-text">Acionamento rápido para inspeção visual aérea de eventos, ocorrências e situações críticas, fornecendo contexto visual imediato aos gestores.</p>
+        <div class="solution-arrow">→</div>
+      </div>
+      <div class="solution-card reveal">
+        <span class="solution-card-num">06</span>
+        <div class="solution-icon">
+          <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="solution-title">Relatórios Estratégicos</div>
+        <p class="solution-text">Documentação técnica completa de cada operação, com análise de imagens, mapeamento de ocorrências e recomendações estratégicas fundamentadas.</p>
+        <div class="solution-arrow">→</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI SECTION -->
+<section id="ai">
+  <div class="ai-bg-accent"></div>
+  <div class="container">
+    <div class="ai-layout">
+      <div class="reveal">
+        <div class="tag-line">IA Embarcada</div>
+        <h2 class="section-title">Inteligência<br><em>Artificial</em><br>em Ação</h2>
+        <p class="section-body" style="margin-top:20px; margin-bottom:0;">Nossa IA auxilia na identificação automática de eventos relevantes, transformando imagens aéreas em inteligência operacional de alto valor. Cada frame processado em milissegundos.</p>
+        <div class="ai-features">
+          <div class="ai-feature reveal">
+            <div class="ai-feature-dot"></div>
+            <div class="ai-feature-text">Detecção de Pessoas</div>
+          </div>
+          <div class="ai-feature reveal">
+            <div class="ai-feature-dot"></div>
+            <div class="ai-feature-text">Detecção de Veículos</div>
+          </div>
+          <div class="ai-feature reveal">
+            <div class="ai-feature-dot"></div>
+            <div class="ai-feature-text">Alterações de Cenário</div>
+          </div>
+          <div class="ai-feature reveal">
+            <div class="ai-feature-dot"></div>
+            <div class="ai-feature-text">Fontes de Calor</div>
+          </div>
+          <div class="ai-feature reveal">
+            <div class="ai-feature-dot"></div>
+            <div class="ai-feature-text">Áreas Críticas</div>
+          </div>
+          <div class="ai-feature reveal">
+            <div class="ai-feature-dot"></div>
+            <div class="ai-feature-text">Eventos Relevantes</div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <div class="ai-image-wrap">
+          <img src="img/ai.jpg" alt="IA FGL Sentinel — Detecções em Tempo Real">
+          <div class="ai-detection-tags">
+            <div class="ai-tag" style="top:18%; left:8%;">PERSON DETECTED — 92%</div>
+            <div class="ai-tag" style="top:40%; right:6%;">VEHICLE — 97%</div>
+            <div class="ai-tag" style="bottom:28%; left:30%;">THERMAL SIG — 91%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECHNOLOGY -->
+<section id="technology">
+  <div class="container">
+    <div class="section-header reveal" style="text-align:center;">
+      <div class="tag-line" style="justify-content:center;">Equipamentos</div>
+      <h2 class="section-title" style="text-align:center;">Nossa<br><em>Tecnologia</em></h2>
+    </div>
+    <div class="tech-hero-image reveal">
+      <img src="img/drone.jpg" alt="Drone Enterprise FGL Sentinel">
+    </div>
+    <div class="tech-grid">
+      <div class="tech-item reveal">
+        <div class="tech-item-icon">🚁</div>
+        <div class="tech-item-title">Drone Enterprise</div>
+        <p class="tech-item-text">Plataformas aéreas de uso profissional com redundância de sistemas, resistência a intempéries e autonomia estendida.</p>
+      </div>
+      <div class="tech-item reveal">
+        <div class="tech-item-icon">📷</div>
+        <div class="tech-item-title">Câmeras Avançadas</div>
+        <p class="tech-item-text">Sensores de alta resolução, zoom óptico e digital avançado para captura de imagens técnicas precisas a grandes distâncias.</p>
+      </div>
+      <div class="tech-item reveal">
+        <div class="tech-item-icon">🌡️</div>
+        <div class="tech-item-title">Câmeras Térmicas</div>
+        <p class="tech-item-text">Detecção de assinaturas térmicas invisíveis à câmera convencional, identificando pessoas, veículos e anomalias.</p>
+      </div>
+      <div class="tech-item reveal">
+        <div class="tech-item-icon">⚡</div>
+        <div class="tech-item-title">Dock Automatizado</div>
+        <p class="tech-item-text">Estação de pouso e recarga autônoma que permite operações contínuas sem intervenção humana no local.</p>
+      </div>
+      <div class="tech-item reveal">
+        <div class="tech-item-icon">🤖</div>
+        <div class="tech-item-title">Inteligência Artificial</div>
+        <p class="tech-item-text">Modelos de visão computacional treinados para detecção, classificação e rastreamento de objetos de interesse.</p>
+      </div>
+      <div class="tech-item reveal">
+        <div class="tech-item-icon">📡</div>
+        <div class="tech-item-title">Sensores Inteligentes</div>
+        <p class="tech-item-text">Array de sensores para coleta multiespectral de dados ambientais, estruturais e operacionais em tempo real.</p>
+      </div>
+      <div class="tech-item reveal">
+        <div class="tech-item-icon">🗺️</div>
+        <div class="tech-item-title">Mapeamento 3D</div>
+        <p class="tech-item-text">Geração de modelos tridimensionais precisos de áreas e estruturas para análise técnica aprofundada.</p>
+      </div>
+      <div class="tech-item reveal">
+        <div class="tech-item-icon">💻</div>
+        <div class="tech-item-title">Plataforma Operacional</div>
+        <p class="tech-item-text">Software proprietário para gestão de missões, análise de dados, geração de relatórios e integração com sistemas existentes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="container">
+    <div class="section-header reveal" style="text-align:center;">
+      <div class="tag-line" style="justify-content:center;">Processo Operacional</div>
+      <h2 class="section-title" style="text-align:center;">Como<br><em>Funciona</em></h2>
+    </div>
+    <div class="timeline">
+      <div class="timeline-step reveal">
+        <div class="timeline-dot">01</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Evento</div>
+          <p class="timeline-text">Identificação de necessidade operacional — ocorrência, inspeção programada ou análise estratégica de área.</p>
+        </div>
+      </div>
+      <div class="timeline-step reveal">
+        <div class="timeline-dot">02</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Acionamento</div>
+          <p class="timeline-text">Mobilização da equipe técnica e dos sistemas aéreos para resposta à demanda identificada.</p>
+        </div>
+      </div>
+      <div class="timeline-step reveal">
+        <div class="timeline-dot">03</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Inspeção Aérea</div>
+          <p class="timeline-text">Execução do voo técnico com captura sistemática de imagens e dados pela plataforma aérea.</p>
+        </div>
+      </div>
+      <div class="timeline-step reveal">
+        <div class="timeline-dot">04</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Análise Operacional</div>
+          <p class="timeline-text">Processamento das imagens pela IA e interpretação técnica pelos especialistas FGL Sentinel.</p>
+        </div>
+      </div>
+      <div class="timeline-step reveal">
+        <div class="timeline-dot">05</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Relatório Estratégico</div>
+          <p class="timeline-text">Geração de documentação técnica completa com achados, análises e recomendações fundamentadas.</p>
+        </div>
+      </div>
+      <div class="timeline-step reveal">
+        <div class="timeline-dot">06</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Tomada de Decisão</div>
+          <p class="timeline-text">O gestor recebe inteligência acionável para embasar suas decisões com segurança e precisão.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARKETS -->
+<section id="markets">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag-line">Segmentos</div>
+      <h2 class="section-title">Mercados<br><em>Atendidos</em></h2>
+    </div>
+  </div>
+  <div class="markets-grid">
+    <div class="market-card reveal">
+      <div class="market-card-bg" style="background: linear-gradient(135deg, #0a1628, #1a2a4a);"></div>
+      <div class="market-card-overlay"></div>
+      <div class="market-pattern"></div>
+      <div class="market-card-num">01</div>
+      <div class="market-card-content">
+        <span class="market-card-icon">🏘️</span>
+        <div class="market-card-title">Condomínios</div>
+        <div class="market-card-text">Inspeção de perímetros, áreas comuns e análise de vulnerabilidades em condomínios residenciais e comerciais.</div>
+      </div>
+    </div>
+    <div class="market-card reveal">
+      <div class="market-card-bg" style="background: linear-gradient(135deg, #1a0a08, #3a1a10);"></div>
+      <div class="market-card-overlay"></div>
+      <div class="market-pattern"></div>
+      <div class="market-card-num">02</div>
+      <div class="market-card-content">
+        <span class="market-card-icon">📦</span>
+        <div class="market-card-title">Centros Logísticos</div>
+        <div class="market-card-text">Cobertura aérea de grandes áreas operacionais, pátios e perímetros de centros de distribuição e operações logísticas.</div>
+      </div>
+    </div>
+    <div class="market-card reveal">
+      <div class="market-card-bg" style="background: linear-gradient(135deg, #0a1a0a, #1a3a1a);"></div>
+      <div class="market-card-overlay"></div>
+      <div class="market-pattern"></div>
+      <div class="market-card-num">03</div>
+      <div class="market-card-content">
+        <span class="market-card-icon">🏭</span>
+        <div class="market-card-title">Indústrias</div>
+        <div class="market-card-text">Inspeção de plantas industriais, análise de conformidade estrutural e inteligência operacional para complexos fabris.</div>
+      </div>
+    </div>
+    <div class="market-card reveal">
+      <div class="market-card-bg" style="background: linear-gradient(135deg, #0f1a08, #2a3a10);"></div>
+      <div class="market-card-overlay"></div>
+      <div class="market-pattern"></div>
+      <div class="market-card-num">04</div>
+      <div class="market-card-content">
+        <span class="market-card-icon">🌾</span>
+        <div class="market-card-title">Fazendas</div>
+        <div class="market-card-text">Cobertura de grandes extensões rurais para análise de áreas, identificação de ocorrências e apoio à gestão patrimonial rural.</div>
+      </div>
+    </div>
+    <div class="market-card reveal">
+      <div class="market-card-bg" style="background: linear-gradient(135deg, #1a1a0a, #3a2a10);"></div>
+      <div class="market-card-overlay"></div>
+      <div class="market-pattern"></div>
+      <div class="market-card-num">05</div>
+      <div class="market-card-content">
+        <span class="market-card-icon">☀️</span>
+        <div class="market-card-title">Usinas Solares</div>
+        <div class="market-card-text">Inspeção técnica de painéis fotovoltaicos, identificação de anomalias térmicas e análise de eficiência operacional.</div>
+      </div>
+    </div>
+    <div class="market-card reveal">
+      <div class="market-card-bg" style="background: linear-gradient(135deg, #0a0a1a, #1a1a3a);"></div>
+      <div class="market-card-overlay"></div>
+      <div class="market-pattern"></div>
+      <div class="market-card-num">06</div>
+      <div class="market-card-content">
+        <span class="market-card-icon">⚡</span>
+        <div class="market-card-title">Infraestruturas Estratégicas</div>
+        <div class="market-card-text">Análise e inspeção de infraestruturas críticas, subestações, dutos, torres e ativos de alta relevância operacional.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REPORTS / DASHBOARD -->
+<section id="reports">
+  <div class="container">
+    <h2 class="reports-headline reveal">
+      Transformamos imagens<br>em <em>inteligência operacional</em>
+    </h2>
+    <div class="dashboard-wrap reveal">
+      <div class="dashboard-inner">
+        <div class="dashboard-header">
+          <div class="dashboard-title">// FGL SENTINEL — PAINEL OPERACIONAL</div>
+          <div class="dashboard-status">
+            <div class="status-dot"></div>
+            SISTEMA ATIVO — TEMPO REAL
+          </div>
+        </div>
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-value"><span class="counter" data-target="847">0</span></div>
+            <div class="metric-label">Horas de Voo</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value blue"><span class="counter" data-target="2340">0</span></div>
+            <div class="metric-label">Km² Analisados</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value"><span class="counter" data-target="156">0</span></div>
+            <div class="metric-label">Ocorrências Registradas</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value blue"><span class="counter" data-target="89">0</span></div>
+            <div class="metric-label">Vulnerabilidades Identificadas</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value"><span class="counter" data-target="312">0</span></div>
+            <div class="metric-label">Recomendações Estratégicas</div>
+          </div>
+        </div>
+        <div class="bars-wrap">
+          <div class="bar-chart">
+            <div class="bar-chart-title">// DETECÇÕES POR CATEGORIA</div>
+            <div class="bar-row">
+              <div class="bar-label">Pessoas</div>
+              <div class="bar-track"><div class="bar-fill" data-width="82"></div></div>
+              <div class="bar-val">82%</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Veículos</div>
+              <div class="bar-track"><div class="bar-fill" data-width="91"></div></div>
+              <div class="bar-val">91%</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Térmico</div>
+              <div class="bar-track"><div class="bar-fill" data-width="78"></div></div>
+              <div class="bar-val">78%</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Anomalias</div>
+              <div class="bar-track"><div class="bar-fill" data-width="95"></div></div>
+              <div class="bar-val">95%</div>
+            </div>
+          </div>
+          <div class="bar-chart">
+            <div class="bar-chart-title">// PERFORMANCE OPERACIONAL</div>
+            <div class="bar-row">
+              <div class="bar-label">Precisão IA</div>
+              <div class="bar-track"><div class="bar-fill blue" data-width="98"></div></div>
+              <div class="bar-val" style="color:var(--blue-light)">98%</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Cobertura</div>
+              <div class="bar-track"><div class="bar-fill blue" data-width="100"></div></div>
+              <div class="bar-val" style="color:var(--blue-light)">100%</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Uptime</div>
+              <div class="bar-track"><div class="bar-fill blue" data-width="99"></div></div>
+              <div class="bar-val" style="color:var(--blue-light)">99%</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Satisfação</div>
+              <div class="bar-track"><div class="bar-fill blue" data-width="97"></div></div>
+              <div class="bar-val" style="color:var(--blue-light)">97%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION -->
+<section id="vision">
+  <div class="vision-bg"></div>
+  <div class="container">
+    <div class="reveal">
+      <div class="tag-line" style="justify-content:center;">Nossa Visão</div>
+      <div class="vision-divider"></div>
+      <blockquote class="vision-quote">
+        Construir a principal rede privada de <em>inteligência aérea</em> aplicada à proteção patrimonial do Brasil.
+      </blockquote>
+      <div class="vision-sub">FGL Sentinel — Visão Além do Alcance</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-layout">
+      <div class="reveal-left">
+        <div class="tag-line">Contato</div>
+        <h2 class="contact-info-title">Vamos<br><em>Conversar</em></h2>
+        <p class="contact-info-text">Apresente seu patrimônio e entenda como a inteligência aérea da FGL Sentinel pode transformar sua capacidade de análise e proteção.</p>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">📍</div>
+          <div class="contact-detail-text">São Paulo — SP, Brasil</div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">✉️</div>
+          <div class="contact-detail-text">contato@fglsentinel.com.br</div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">📱</div>
+          <div class="contact-detail-text">+55 (11) 99999-9999</div>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <form id="contactForm" onsubmit="handleForm(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nome</label>
+              <input type="text" class="form-input" placeholder="Seu nome completo" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Empresa</label>
+              <input type="text" class="form-input" placeholder="Nome da empresa" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Telefone</label>
+              <input type="tel" class="form-input" placeholder="(00) 00000-0000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">E-mail</label>
+              <input type="email" class="form-input" placeholder="seu@email.com.br" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mensagem</label>
+            <textarea class="form-textarea" placeholder="Descreva brevemente seu patrimônio e necessidade..." required></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%; text-align:center; font-size:13px;">
+            Solicitar Apresentação
+          </button>
+        </form>
+        <div id="formSuccess" style="display:none; text-align:center; padding:40px; border:1px solid var(--border-orange);">
+          <div style="font-size:36px; margin-bottom:12px;">✅</div>
+          <div style="font-family:var(--font-display); font-size:20px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--orange);">Mensagem Enviada</div>
+          <div style="font-size:14px; color:rgba(255,255,255,0.5); margin-top:8px;">Nosso time entrará em contato em breve.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <img src="img/logo.png" alt="FGL Sentinel" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+          <div style="display:none; font-family:var(--font-display); font-size:20px; font-weight:900; letter-spacing:3px; color:var(--white); margin-bottom:16px;"><span style="color:var(--orange);">FGL</span> SENTINEL</div>
+        </div>
+        <p class="footer-tagline">Inteligência Aérea Aplicada à Proteção Patrimonial. Visão Além do Alcance.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social" title="LinkedIn">in</a>
+          <a href="#" class="footer-social" title="Instagram">ig</a>
+          <a href="#" class="footer-social" title="YouTube">yt</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Soluções</div>
+        <ul class="footer-links">
+          <li><a href="#solutions">Inspeção Aérea</a></li>
+          <li><a href="#solutions">Inteligência Operacional</a></li>
+          <li><a href="#solutions">Análise de Vulnerabilidades</a></li>
+          <li><a href="#solutions">Apoio Tecnológico</a></li>
+          <li><a href="#solutions">Relatórios Estratégicos</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Mercados</div>
+        <ul class="footer-links">
+          <li><a href="#markets">Condomínios</a></li>
+          <li><a href="#markets">Centros Logísticos</a></li>
+          <li><a href="#markets">Indústrias</a></li>
+          <li><a href="#markets">Fazendas</a></li>
+          <li><a href="#markets">Usinas Solares</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Empresa</div>
+        <ul class="footer-links">
+          <li><a href="#about">Quem Somos</a></li>
+          <li><a href="#ai">Inteligência Artificial</a></li>
+          <li><a href="#technology">Tecnologia</a></li>
+          <li><a href="#vision">Visão</a></li>
+          <li><a href="#contact">Contato</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 FGL SENTINEL — TODOS OS DIREITOS RESERVADOS</div>
+      <div class="footer-legal">
+        <a href="#">Política de Privacidade</a>
+        <a href="#">Termos de Uso</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/5511999999999" target="_blank" class="whatsapp-float" title="Falar pelo WhatsApp">
+  <div class="whatsapp-tooltip">Falar pelo WhatsApp</div>
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+</a>
+
+<script>
+// ─── IMAGE MAPPING ─────────────────────────────────────────
+// Map the uploaded images to their display roles
+const uploadedImages = {
+  'command': 'ChatGPT_Image_3_de_jun__de_2026__10_29_58.png',   // command center
+  'drone':   'ChatGPT_Image_3_de_jun__de_2026__10_28_02.png',   // drone photo
+  'ai':      'ChatGPT_Image_3_de_jun__de_2026__09_52_18.png',   // AI interface
+  'hero':    'ChatGPT_Image_3_de_jun__de_2026__09_48_15.png',   // hero (operator+drone)
+  'logo':    'ChatGPT_Image_2_de_jun__de_2026__14_09_02.png',   // logo
+};
+
+// Set images from uploads folder
+(function(){
+  const base = 'img/';
+  // Try setting hero background
+  const heroBg = document.getElementById('heroBg');
+  if(heroBg){
+    // We'll use CSS background - load as object URL from upload path
+    loadImageAsDataURL('../../../mnt/user-data/uploads/' + uploadedImages.hero, function(url){
+      heroBg.style.backgroundImage = `url('${url}')`;
+    });
+  }
+
+  // Set all <img> src tags
+  document.querySelectorAll('img[src^="img/"]').forEach(img => {
+    const key = img.getAttribute('src').replace('img/','').replace('.jpg','').replace('.png','');
+    if(uploadedImages[key]){
+      loadImageAsDataURL('../../../mnt/user-data/uploads/' + uploadedImages[key], function(url){
+        img.src = url;
+        img.onerror = null;
+      });
+    }
+  });
+})();
+
+function loadImageAsDataURL(path, callback){
+  // Try fetch approach first
+  fetch(path)
+    .then(r => r.blob())
+    .then(blob => {
+      const reader = new FileReader();
+      reader.onload = () => callback(reader.result);
+      reader.readAsDataURL(blob);
+    })
+    .catch(() => {
+      // fallback: try direct path
+      callback(path);
+    });
+}
+
+// ─── NAVBAR SCROLL ─────────────────────────────────────────
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  if(window.scrollY > 50) navbar.classList.add('scrolled');
+  else navbar.classList.remove('scrolled');
+});
+
+// ─── PARALLAX HERO ─────────────────────────────────────────
+const heroBg = document.getElementById('heroBg');
+window.addEventListener('scroll', () => {
+  if(!heroBg) return;
+  const scrolled = window.scrollY;
+  heroBg.style.transform = `scale(1.05) translateY(${scrolled * 0.3}px)`;
+});
+
+// ─── MOBILE MENU ───────────────────────────────────────────
+function toggleMenu(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ─── INTERSECTION OBSERVER FOR REVEALS ─────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if(entry.isIntersecting){
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+        // Animate bar fills
+        entry.target.querySelectorAll('.bar-fill').forEach(bar => {
+          const w = bar.getAttribute('data-width');
+          if(w) bar.style.width = w + '%';
+        });
+        // Animate counters
+        entry.target.querySelectorAll('.counter').forEach(animateCounter);
+      }, 100);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+  observer.observe(el);
+});
+
+// Dashboard reveal
+const dashObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.querySelectorAll('.bar-fill').forEach(bar => {
+        const w = bar.getAttribute('data-width');
+        if(w) setTimeout(() => bar.style.width = w + '%', 400);
+      });
+      entry.target.querySelectorAll('.counter').forEach(c => {
+        setTimeout(() => animateCounter(c), 200);
+      });
+      dashObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.dashboard-wrap, #hero').forEach(el => dashObs.observe(el));
+
+// ─── COUNTER ANIMATION ─────────────────────────────────────
+function animateCounter(el) {
+  const target = parseInt(el.getAttribute('data-target'));
+  if(!target || el._animated) return;
+  el._animated = true;
+  const duration = 1800;
+  const start = performance.now();
+  function update(now){
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.floor(eased * target).toLocaleString('pt-BR');
+    if(progress < 1) requestAnimationFrame(update);
+    else el.textContent = target.toLocaleString('pt-BR');
+  }
+  requestAnimationFrame(update);
+}
+
+// ─── FORM HANDLER ──────────────────────────────────────────
+function handleForm(e){
+  e.preventDefault();
+  document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+}
+
+// ─── STAGGER REVEAL ────────────────────────────────────────
+document.querySelectorAll('.solutions-grid .solution-card, .tech-grid .tech-item, .about-highlight').forEach((el, i) => {
+  el.style.transitionDelay = (i % 3) * 0.1 + 's';
+});
+
+// ─── SMOOTH ACTIVE NAV ─────────────────────────────────────
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a:not(.nav-cta)');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if(window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.style.color = a.getAttribute('href') === '#' + current
+      ? 'var(--orange)'
+      : 'rgba(255,255,255,0.7)';
+  });
+});
+</script>
+</body>
+</html>
+Concluído
+
+Você está sem mensagens gratuitas até 15:30
