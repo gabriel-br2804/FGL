@@ -43,6 +43,10 @@ const PAGE_SIZE_CAP = 1; // páginas por (entidade x modalidade) — controla vo
 // tentativas com backoff é mais lento, mas chega a bem mais entidades.
 const CONCURRENCY = 2;
 const DELAY_BETWEEN_REQUESTS_MS = 700;
+// Quantos contratos (maior valor primeiro) recebem uma segunda chamada
+// para buscar o fornecedor real — cada um custa mais uma requisição ao
+// PNCP, que já está perto do limite de taxa.
+const SUPPLIER_LOOKUP_LIMIT = 40;
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -69,7 +73,13 @@ function normalizeRecord(raw, scope) {
   try {
     const orgao = raw.orgaoEntidade ?? raw.orgao ?? {};
     const unidade = raw.unidadeOrgao ?? {};
-    const valor = pick(raw, ["valorTotalEstimado", "valorTotalHomologado", "valorGlobal", "valorTotal"]);
+    // Confirmado com uma resposta real do PNCP: `contratacoes/publicacao` é
+    // o AVISO da contratação, não o contrato assinado — no pregão
+    // eletrônico o fornecedor ainda não é conhecido nesse estágio (não há
+    // nenhum campo de fornecedor no payload). valorTotalHomologado (quando
+    // presente) já reflete o valor apurado/definido, mais próximo do real
+    // do que a mera estimativa — por isso vem primeiro na prioridade.
+    const valor = pick(raw, ["valorTotalHomologado", "valorTotalEstimado", "valorGlobal", "valorTotal"]);
     return {
       pncpId: pick(raw, ["numeroControlePNCP", "numeroControlePncp", "id"]),
       object: pick(raw, ["objetoCompra", "objeto", "descricaoObjeto"]) ?? "(objeto não informado)",
@@ -84,12 +94,43 @@ function normalizeRecord(raw, scope) {
       supplierCnpj: pick(raw, ["niFornecedor", "cnpjFornecedor"]),
       supplierName: pick(raw, ["nomeRazaoSocialFornecedor", "razaoSocialFornecedor", "nomeFornecedor"]),
       participants: pick(raw, ["quantidadeParticipantes", "numeroParticipantes"]),
+      // Identificadores da compra na PNCP — necessários para buscar o
+      // fornecedor/resultado num segundo passo (ver fetchSupplierForRecord).
+      anoCompra: pick(raw, ["anoCompra"]),
+      sequencialCompra: pick(raw, ["sequencialCompra"]),
       scope,
     };
   } catch (err) {
     console.warn(`[ingest] falha ao normalizar registro PNCP (${scope}): ${err.message}`);
     return null;
   }
+}
+
+/**
+ * `contratacoes/publicacao` não traz o fornecedor quando a contratação
+ * ainda depende de disputa (pregão). O fornecedor/vencedor de cada item
+ * fica em `/v1/orgaos/{cnpj}/compras/{ano}/{sequencial}/resultados` — este
+ * segundo passo busca isso para os registros de município mais relevantes
+ * (maior valor), já que consultar todos multiplicaria as chamadas ao PNCP
+ * (que já está no limite de requisições).
+ */
+async function fetchSupplierForRecord(record) {
+  if (!record.agencyCnpj || !record.anoCompra || !record.sequencialCompra) return null;
+  const url = `https://pncp.gov.br/api/consulta/v1/orgaos/${record.agencyCnpj}/compras/${record.anoCompra}/${record.sequencialCompra}/resultados`;
+  const res = await fetchJson(url, { label: `PNCP resultados ${record.pncpId}`, retries: 3, retryDelayMs: 3000 });
+  await sleep(DELAY_BETWEEN_REQUESTS_MS);
+  if (!res.ok) return { error: res.error };
+
+  const list = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : null;
+  const first = list?.[0];
+  if (!first) return { rawSample: res.data };
+
+  const fornecedor = first.fornecedor ?? first.niFornecedor ? first : first.resultado ?? first;
+  return {
+    supplierCnpj: pick(fornecedor, ["niFornecedor", "cnpjFornecedor", "ni"]),
+    supplierName: pick(fornecedor, ["nomeRazaoSocialFornecedor", "razaoSocialFornecedor", "nomeFornecedor", "nome"]),
+    rawSample: first,
+  };
 }
 
 async function queryEntity({ uf, codigoMunicipioIbge, scopeLabel }) {
@@ -187,6 +228,36 @@ export async function ingestPncp(targets) {
     console.warn(`[ingest] PNCP teve problemas em ${sourceErrors.length} entidade(s) — ver contracts.json > errors para detalhes.`);
   }
 
+  // Segundo passo: busca o fornecedor real dos contratos de município mais
+  // relevantes (maior valor) — é o que faltava para o enriquecimento via
+  // BrasilAPI ter algo para consultar.
+  const supplierLookupTargets = allRecords
+    .filter((r) => r.scope.startsWith("município") && r.value && !r.supplierCnpj)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, SUPPLIER_LOOKUP_LIMIT);
+
+  const resultadosRawSamples = [];
+  const resultadosErrors = [];
+  if (supplierLookupTargets.length > 0) {
+    console.log(`[ingest] buscando fornecedor real de ${supplierLookupTargets.length} contrato(s) de município (maior valor primeiro)...`);
+    let resolved = 0;
+    for (const record of supplierLookupTargets) {
+      const result = await fetchSupplierForRecord(record);
+      if (!result) continue;
+      if (result.error) {
+        resultadosErrors.push({ pncpId: record.pncpId, error: result.error });
+        continue;
+      }
+      if (result.supplierCnpj) {
+        record.supplierCnpj = result.supplierCnpj;
+        record.supplierName = result.supplierName;
+        resolved++;
+      }
+      if (resultadosRawSamples.length < 2 && result.rawSample) resultadosRawSamples.push(result.rawSample);
+    }
+    console.log(`[ingest] fornecedor real encontrado em ${resolved}/${supplierLookupTargets.length} contrato(s) consultados.`);
+  }
+
   await mkdir(OUT_DIR, { recursive: true });
   const payload = {
     generatedAt: new Date().toISOString(),
@@ -198,9 +269,13 @@ export async function ingestPncp(targets) {
       entitiesQueried: allTargets.length,
       recordsFetched: allRecords.length,
       entitiesWithErrors: sourceErrors.length,
+      supplierLookupsAttempted: supplierLookupTargets.length,
+      supplierLookupsResolved: supplierLookupTargets.filter((r) => r.supplierCnpj).length,
     },
     errors: sourceErrors,
+    resultadosErrors,
     rawSampleByScope: rawSamplesByScope,
+    resultadosRawSample: resultadosRawSamples,
   };
   await writeFile(path.join(OUT_DIR, "contracts.json"), JSON.stringify(payload, null, 2));
   console.log(`[ingest] escrito em src/lib/data/real/contracts.json`);
