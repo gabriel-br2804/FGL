@@ -15,7 +15,15 @@ export function MapExplorer({
   uniao,
 }: {
   stateAggregates: StateAggregate[];
-  uniao: { totalSpent: number; totalContracts: number; totalSuppliers: number; attentionPoints: number; statesCount: number; municipalitiesCount: number };
+  uniao: {
+    totalSpent: number;
+    totalContracts: number;
+    totalSuppliers: number;
+    attentionPoints: number;
+    statesCount: number;
+    municipalitiesCount: number;
+    realFederal: { count: number; totalValue: number; pncpCount: number; portalTransparenciaCount: number };
+  };
 }) {
   const [scope, setScope] = useState<Scope>("estado");
   const [selectedState, setSelectedState] = useState<string | null>("SP");
@@ -116,10 +124,22 @@ export function MapExplorer({
                   <dd className="text-lg font-bold text-navy-900">{uniao.municipalitiesCount}</dd>
                 </div>
               </dl>
-              <p className="text-xs text-ink-500">
-                Cobertura federal no MVP inclui contratos, despesas e convênios simulados no padrão do Portal da
-                Transparência. Ver <Link href="/fontes" className="text-signal-blue hover:underline">Fontes de dados</Link>.
-              </p>
+              {uniao.realFederal.count > 0 ? (
+                <div className="rounded-xl2 bg-signal-greenBg p-3 text-xs text-signal-green">
+                  <strong>{fmtNumber(uniao.realFederal.count)}</strong> contrato(s) federais reais identificados
+                  ({fmtBRLCompact(uniao.realFederal.totalValue)}) — {uniao.realFederal.pncpCount} via PNCP
+                  {uniao.realFederal.portalTransparenciaCount > 0
+                    ? ` e ${uniao.realFederal.portalTransparenciaCount} via Portal da Transparência`
+                    : ""}
+                  .
+                </div>
+              ) : (
+                <p className="text-xs text-ink-500">
+                  Cobertura federal no MVP inclui contratos, despesas e convênios simulados no padrão do Portal da
+                  Transparência. Rode <code className="font-mono">npm run ingest</code> para trazer dados reais. Ver{" "}
+                  <Link href="/fontes" className="text-signal-blue hover:underline">Fontes de dados</Link>.
+                </p>
+              )}
             </div>
           )}
 
@@ -150,6 +170,12 @@ export function MapExplorer({
                   <dd className="text-lg font-bold text-signal-amber">{fmtNumber(selected.attentionPoints)}</dd>
                 </div>
               </dl>
+              {selected.realStateContracts.count > 0 && (
+                <div className="rounded-xl2 bg-signal-greenBg p-3 text-xs text-signal-green">
+                  <strong>{fmtNumber(selected.realStateContracts.count)}</strong> contrato(s) estaduais reais (PNCP)
+                  identificados, {fmtBRLCompact(selected.realStateContracts.totalValue)}.
+                </div>
+              )}
               <div>
                 <div className="data-label mb-2">Municípios monitorados nesta UF</div>
                 <div className="space-y-1.5">

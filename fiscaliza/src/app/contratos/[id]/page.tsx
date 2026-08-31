@@ -39,7 +39,14 @@ export default function ContractPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="container-page py-10 sm:py-14">
-      <span className="section-label">Contrato</span>
+      <div className="flex items-center gap-2">
+        <span className="section-label">Contrato</span>
+        {contract.source === "pncp" ? (
+          <span className="badge bg-signal-greenBg text-signal-green">Dado real · PNCP</span>
+        ) : (
+          <span className="badge bg-ink-900/5 text-ink-500">Dado simulado (MVP)</span>
+        )}
+      </div>
       <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-navy-900 sm:text-4xl">
         Contrato nº {contract.number}
       </h1>

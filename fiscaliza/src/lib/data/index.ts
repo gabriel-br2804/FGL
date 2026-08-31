@@ -1,6 +1,7 @@
 import { getDB } from "./generate";
 import { scoreCompany, scoreMunicipality } from "../engine/score";
 import { buildSignalsForCompany, buildSignalsForMunicipality } from "../engine/signals";
+import { REAL_CONTRACTS, REAL_FEDERAL, REAL_MANIFEST, REAL_GEO } from "./real-data";
 import type {
   Municipality,
   Company,
@@ -141,7 +142,84 @@ export function getBid(id?: string): Bid | undefined {
 }
 
 export function listDataSources(): DataSource[] {
-  return getDB().dataSources;
+  // Sobrepõe o status estático (definido em generate.ts) com o resultado
+  // real da última `npm run ingest`, quando existir — assim /fontes e o
+  // dashboard refletem o que de fato foi coletado, não uma promessa fixa.
+  return getDB().dataSources.map((s) => {
+    if (s.connector.startsWith("FederalTransparencyConnector") || s.id === "src-portal-transparencia") {
+      const pt = REAL_MANIFEST.portalTransparencia;
+      return pt.ok
+        ? { ...s, simulated: false, lastSync: REAL_FEDERAL.generatedAt ?? s.lastSync }
+        : s;
+    }
+    if (s.connector.startsWith("ComprasGovConnector") || s.id === "src-compras-gov") {
+      const pncp = REAL_MANIFEST.pncp;
+      return pncp.ok ? { ...s, simulated: false, lastSync: REAL_CONTRACTS.generatedAt ?? s.lastSync } : s;
+    }
+    if (s.id === "src-sp-transparencia" || s.id === "src-jandira" || s.connector.startsWith("StateConnector") || s.connector.startsWith("MunicipalConnector")) {
+      const pncp = REAL_MANIFEST.pncp;
+      return pncp.ok ? { ...s, simulated: false, lastSync: REAL_CONTRACTS.generatedAt ?? s.lastSync } : s;
+    }
+    return s;
+  });
+}
+
+export interface RealDataStatus {
+  ibge: { ok: boolean; statesFetched: number; municipalitiesFetched: number };
+  pncp: { ok: boolean; recordsFetched: number; entitiesQueried: number };
+  portalTransparencia: { ok: boolean; contractsFetched: number; skipped: boolean; reason?: string };
+  generatedAt: string | null;
+}
+
+export function getRealDataStatus(): RealDataStatus {
+  return {
+    ibge: {
+      ok: REAL_MANIFEST.ibge.ok,
+      statesFetched: REAL_MANIFEST.ibge.statesFetched ?? 0,
+      municipalitiesFetched: REAL_MANIFEST.ibge.municipalitiesFetched ?? 0,
+    },
+    pncp: {
+      ok: REAL_MANIFEST.pncp.ok,
+      recordsFetched: REAL_MANIFEST.pncp.recordsFetched ?? 0,
+      entitiesQueried: REAL_MANIFEST.pncp.entitiesQueried ?? 0,
+    },
+    portalTransparencia: {
+      ok: REAL_MANIFEST.portalTransparencia.ok,
+      contractsFetched: REAL_MANIFEST.portalTransparencia.contractsFetched ?? 0,
+      skipped: REAL_MANIFEST.portalTransparencia.skipped ?? true,
+      reason: REAL_MANIFEST.portalTransparencia.reason,
+    },
+    generatedAt: REAL_MANIFEST.generatedAt,
+  };
+}
+
+export interface RealScopeStats {
+  count: number;
+  totalValue: number;
+}
+
+/** Contratos reais do PNCP com escopo estadual (sem município associado) —
+ * agregados por UF, sem tentar modelá-los como Contract completos. */
+export function getRealStateStats(uf: string): RealScopeStats {
+  const records = REAL_CONTRACTS.records.filter((r) => r.scope === `estado ${uf}`);
+  return {
+    count: records.length,
+    totalValue: records.reduce((s, r) => s + (r.value ?? 0), 0),
+  };
+}
+
+/** Contratos reais da União: soma o que o PNCP trouxe com escopo federal e,
+ * quando disponível, os contratos do Portal da Transparência. */
+export function getRealFederalStats(): RealScopeStats & { pncpCount: number; portalTransparenciaCount: number } {
+  const pncpRecords = REAL_CONTRACTS.records.filter((r) => r.scope === "União (federal)");
+  const pncpTotal = pncpRecords.reduce((s, r) => s + (r.value ?? 0), 0);
+  const ptTotal = REAL_FEDERAL.contracts.reduce((s, c) => s + (c.value ?? 0), 0);
+  return {
+    count: pncpRecords.length + REAL_FEDERAL.contracts.length,
+    totalValue: pncpTotal + ptTotal,
+    pncpCount: pncpRecords.length,
+    portalTransparenciaCount: REAL_FEDERAL.contracts.length,
+  };
 }
 
 export function getCompanyScore(id: string): FiscalizaScoreBreakdown | undefined {
@@ -181,7 +259,7 @@ export function getDashboardStats(): DashboardStats {
     totalSuppliers,
     totalAttentionPoints,
     totalAgencies: db.agencies.length,
-    lastUpdate: "2026-08-30",
+    lastUpdate: (REAL_CONTRACTS.generatedAt ?? REAL_GEO.generatedAt ?? "2026-08-30T00:00:00Z").slice(0, 10),
   };
 }
 
@@ -193,6 +271,8 @@ export interface StateAggregate {
   attentionPoints: number;
   avgScore: number;
   municipalities: Municipality[];
+  /** Contratos reais do PNCP com escopo estadual (não amarrados a um município específico). */
+  realStateContracts: RealScopeStats;
 }
 
 export function getStateAggregate(stateId: string): StateAggregate | undefined {
@@ -211,7 +291,8 @@ export function getStateAggregate(stateId: string): StateAggregate | undefined {
   const avgScore = municipalities.length
     ? Math.round(municipalities.reduce((s, m) => s + m.fiscalizaScore, 0) / municipalities.length)
     : 0;
-  return { state, totalSpent, totalContracts, totalSuppliers, attentionPoints, avgScore, municipalities };
+  const realStateContracts = getRealStateStats(stateId.toUpperCase());
+  return { state, totalSpent, totalContracts, totalSuppliers, attentionPoints, avgScore, municipalities, realStateContracts };
 }
 
 export function listStateAggregates(): StateAggregate[] {
@@ -233,6 +314,7 @@ export function getUniaoAggregate() {
     attentionPoints: getDashboardStats().totalAttentionPoints,
     statesCount: db.states.length,
     municipalitiesCount: db.municipalities.length,
+    realFederal: getRealFederalStats(),
   };
 }
 

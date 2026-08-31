@@ -179,11 +179,15 @@ export function buildBreakdown(
 export function scoreCompany(company: Company, contracts: Contract[], bids: Bid[], now = new Date("2026-08-31")) {
   const totalValue = contracts.reduce((s, c) => s + c.currentValue, 0);
   const ageMonths = ageInMonths(company.openedAt, now);
+  // Empresas reais (PNCP) sem data de abertura conhecida não podem ser
+  // avaliadas pelo fator "empresa recente" — não há como calculá-lo sem
+  // inventar uma data, então o fator fica de fora do cálculo dela.
+  const ageKnown = company.openedAtKnown !== false;
   const points = computeFactorPoints({
     contracts,
     bids,
     agencyShareLookup: () => 0,
-    companyAges: totalValue > 0 ? [{ ageMonths, shareOfValue: 1 }] : [],
+    companyAges: ageKnown && totalValue > 0 ? [{ ageMonths, shareOfValue: 1 }] : [],
   });
   return buildBreakdown("company", company.id, points);
 }

@@ -73,6 +73,8 @@ export interface Municipality {
   spendingHistory: { year: number; value: number }[];
   lat: number;
   lon: number;
+  /** "ibge" quando a população vem da ingestão real do IBGE; ausente/"estimado" quando é uma aproximação do MVP. */
+  populationSource?: "ibge" | "estimado";
 }
 
 export type SpendingArea =
@@ -99,6 +101,10 @@ export interface Company {
   fiscalizaScore: number;
   partners: { name: string; role: string; personId: string }[];
   yearlyContracted: { year: number; value: number }[];
+  /** "pncp" quando a empresa foi identificada a partir de contratos reais do PNCP; ausente = fictícia (dado simulado do MVP). */
+  source?: "pncp";
+  /** false quando a data de abertura é um valor de preenchimento (real, mas sem essa informação disponível na fonte). */
+  openedAtKnown?: boolean;
 }
 
 export interface Person {
@@ -179,6 +185,8 @@ export interface Contract {
   amendments: Amendment[];
   payments: Payment[];
   medianComparable: number; // mediana de contratos semelhantes
+  /** "pncp" quando o contrato veio da ingestão real; ausente = gerado sinteticamente para o MVP. */
+  source?: "pncp";
 }
 
 export interface Project {

@@ -40,7 +40,14 @@ export default function MunicipalityPage({ params }: { params: { id: string } })
     <div className="container-page py-10 sm:py-14">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <span className="section-label">Município</span>
+          <div className="flex items-center gap-2">
+            <span className="section-label">Município</span>
+            {muni.populationSource === "ibge" ? (
+              <span className="badge bg-signal-greenBg text-signal-green">População real · IBGE</span>
+            ) : (
+              <span className="badge bg-ink-900/5 text-ink-500">População estimada (MVP)</span>
+            )}
+          </div>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-navy-900 sm:text-4xl">
             {muni.name} — {muni.stateId}
           </h1>

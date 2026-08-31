@@ -9,7 +9,8 @@ import {
   CONTRACT_OBJECTS,
   AMENDMENT_REASONS,
 } from "./companies-seed";
-import { rngFor, pick, randInt, randFloat, weighted } from "./rng";
+import { rngFor, pick, randInt, randFloat, weighted, hashString } from "./rng";
+import { REAL_GEO, REAL_CONTRACTS, classifyCategory, type RealMunicipio } from "./real-data";
 import type {
   Municipality,
   State,
@@ -72,6 +73,35 @@ function slugCompany(name: string, idx: number) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "") + `-${idx}`
   );
+}
+
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function normalizeName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .trim();
+}
+
+/** Índices para casar os municípios da seed (curated, com lat/lon) com os
+ * municípios reais vindos da ingestão IBGE (nome + UF), quando disponível. */
+function buildRealMunicipioIndexes() {
+  const byNameUf = new Map<string, RealMunicipio>();
+  const byIbgeId = new Map<string, RealMunicipio>();
+  for (const m of REAL_GEO.municipalities) {
+    if (m.stateId) byNameUf.set(`${normalizeName(m.name)}|${m.stateId}`, m);
+    byIbgeId.set(String(m.ibgeId), m);
+  }
+  return { byNameUf, byIbgeId };
 }
 
 export interface Database {
@@ -218,11 +248,22 @@ function buildDatabase(): Database {
   // Municipalities with financials
   const municipalities: Municipality[] = [];
   const municipalityById = new Map<string, Municipality>();
+  const municipalityByIbgeCode = new Map<string, Municipality>();
+  const realIndexes = buildRealMunicipioIndexes();
 
-  for (const seed of MUNICIPALITIES) {
-    const rand = rngFor(`muni-${seed.slug}`);
+  function buildMunicipality(input: {
+    slug: string;
+    name: string;
+    stateId: string;
+    population: number;
+    ibgeCode: string;
+    populationSource: "ibge" | "estimado";
+    lat: number;
+    lon: number;
+  }) {
+    const rand = rngFor(`muni-${input.slug}`);
     const perCapita = randFloat(rand, 2200, 4600);
-    const annualBudget = Math.round(seed.population * perCapita);
+    const annualBudget = Math.round(input.population * perCapita);
     const totalSpent = Math.round(annualBudget * randFloat(rand, 0.58, 0.88));
 
     const weights = CATEGORIES.map((c) => ({
@@ -247,15 +288,15 @@ function buildDatabase(): Database {
     // município num intervalo realista de demonstração — antes disso,
     // municípios grandes (ex.: São Paulo) geravam milhares de contratos e
     // tornavam a build inviável.
-    const totalContracts = Math.max(18, Math.round((6 + Math.log10(seed.population) * 8) * randFloat(rand, 0.85, 1.15)));
+    const totalContracts = Math.max(18, Math.round((6 + Math.log10(input.population) * 8) * randFloat(rand, 0.85, 1.15)));
     const totalSuppliers = Math.max(6, Math.round(totalContracts * randFloat(rand, 0.5, 0.75)));
 
     const muni: Municipality = {
-      id: seed.slug,
-      ibgeCode: String(1000000 + Math.floor(rand() * 8999999)),
-      name: seed.name,
-      stateId: seed.stateId,
-      population: seed.population,
+      id: input.slug,
+      ibgeCode: input.ibgeCode,
+      name: input.name,
+      stateId: input.stateId,
+      population: input.population,
       annualBudget,
       totalSpent,
       totalContracts,
@@ -264,11 +305,13 @@ function buildDatabase(): Database {
       fiscalizaScore: 0,
       spendingByArea,
       spendingHistory,
-      lat: seed.lat,
-      lon: seed.lon,
+      lat: input.lat,
+      lon: input.lon,
+      populationSource: input.populationSource,
     };
     municipalities.push(muni);
     municipalityById.set(muni.id, muni);
+    municipalityByIbgeCode.set(muni.ibgeCode, muni);
 
     entities.push({ id: `gov-muni-${muni.id}`, name: `Prefeitura Municipal de ${muni.name}`, sphere: "Municipal" });
     for (const cat of CATEGORIES) {
@@ -277,6 +320,55 @@ function buildDatabase(): Database {
         name: AGENCY_BY_CATEGORY[cat],
         entityId: `gov-muni-${muni.id}`,
         municipalityId: muni.id,
+      });
+    }
+    return muni;
+  }
+
+  for (const seed of MUNICIPALITIES) {
+    const real = realIndexes.byNameUf.get(`${normalizeName(seed.name)}|${seed.stateId}`);
+    const population = real?.population ?? seed.population;
+    const ibgeCode = real ? String(real.ibgeId) : String(1_000_000 + hashString(seed.slug) % 8_999_999);
+    buildMunicipality({
+      slug: seed.slug,
+      name: seed.name,
+      stateId: seed.stateId,
+      population,
+      ibgeCode,
+      populationSource: real?.population != null ? "ibge" : "estimado",
+      lat: seed.lat,
+      lon: seed.lon,
+    });
+  }
+
+  // Municípios adicionais que só existem porque a ingestão real (PNCP)
+  // encontrou contratos lá, mas não fazem parte da lista curada acima —
+  // criados com o mesmo gerador financeiro, para que a cobertura cresça
+  // organicamente conforme mais fontes reais forem integradas.
+  if (REAL_CONTRACTS.records.length > 0) {
+    const referencedIbgeIds = new Set(
+      REAL_CONTRACTS.records
+        .filter((r) => r.scope.startsWith("município") && r.municipalityIbge != null)
+        .map((r) => String(r.municipalityIbge))
+    );
+    for (const ibgeId of referencedIbgeIds) {
+      if (municipalityByIbgeCode.has(ibgeId)) continue;
+      const real = realIndexes.byIbgeId.get(ibgeId);
+      if (!real || !real.stateId) continue;
+      const capitalSeed = MUNICIPALITIES.find((m) => m.stateId === real.stateId && m.capital);
+      const slugBase = slugify(`${real.name}-${real.stateId}`);
+      let slug = slugBase;
+      let dedupe = 1;
+      while (municipalityById.has(slug)) slug = `${slugBase}-${++dedupe}`;
+      buildMunicipality({
+        slug,
+        name: real.name,
+        stateId: real.stateId,
+        population: real.population ?? 50_000,
+        ibgeCode: ibgeId,
+        populationSource: real.population != null ? "ibge" : "estimado",
+        lat: capitalSeed?.lat ?? -14.235,
+        lon: capitalSeed?.lon ?? -51.9253,
       });
     }
   }
@@ -481,6 +573,97 @@ function buildDatabase(): Database {
     const localPool = Array.from({ length: 10 }, () => pick(rand, nonFlagshipCompanies));
     const pool = FLAGSHIP_MUNICIPALITIES.has(muni.id) ? [...localPool, flagship] : localPool;
     makeContractsForMunicipality(muni, localCount, pool);
+  }
+
+  // --- Injeção de dados reais (PNCP) sobre a base sintética -------------
+  // Só entram aqui registros com escopo de MUNICÍPIO e valor conhecido —
+  // registros de escopo estadual/federal (sem município) são agregados à
+  // parte (ver getRealStateStats/getRealFederalStats em data/index.ts),
+  // pois não têm como ser amarrados de forma correta ao modelo de
+  // Contract (que exige um município). Isso mantém o que é real
+  // rastreável e evita forçar municípios fictícios em contratos estaduais.
+  let realContractSeq = 0;
+  const realCompanyIdByCnpj = new Map<string, string>();
+  for (const c of companies) {
+    const digits = c.cnpj.replace(/\D/g, "");
+    if (digits) realCompanyIdByCnpj.set(digits, c.id);
+  }
+
+  for (const record of REAL_CONTRACTS.records) {
+    if (!record.scope.startsWith("município")) continue;
+    if (record.municipalityIbge == null || !record.value || record.value <= 0) continue;
+    const muni = municipalityByIbgeCode.get(String(record.municipalityIbge));
+    if (!muni) continue;
+
+    const cnpjDigits = (record.supplierCnpj ?? "").replace(/\D/g, "");
+    let companyId = cnpjDigits ? realCompanyIdByCnpj.get(cnpjDigits) : undefined;
+    if (!companyId) {
+      companyId = cnpjDigits ? `pncp-${cnpjDigits}` : `pncp-desconhecido-${++realContractSeq}`;
+      const company: Company = {
+        id: companyId,
+        cnpj: record.supplierCnpj ?? "Não informado",
+        name: record.supplierName ?? "Fornecedor não identificado",
+        status: "Ativa",
+        openedAt: "2015-01-01T00:00:00.000Z",
+        openedAtKnown: false,
+        municipalityId: muni.id,
+        economicActivity: "Não classificado nesta integração (dado real PNCP)",
+        totalContracted: 0,
+        contractsCount: 0,
+        contractingAgenciesCount: 0,
+        municipalitiesCount: 0,
+        fiscalizaScore: 0,
+        partners: [],
+        yearlyContracted: [],
+        source: "pncp",
+      };
+      companies.push(company);
+      companyById.set(company.id, company);
+      if (cnpjDigits) realCompanyIdByCnpj.set(cnpjDigits, company.id);
+    }
+
+    const agencySlug = slugify(record.agencyName || "orgao-nao-identificado");
+    const agencyId = `ag-real-${agencySlug}-${muni.id}`;
+    if (!agencyById.has(agencyId)) {
+      addAgency({
+        id: agencyId,
+        name: record.agencyName ?? "Órgão não identificado",
+        entityId: `gov-muni-${muni.id}`,
+        municipalityId: muni.id,
+      });
+    }
+
+    realContractSeq++;
+    const contractId = `real-${realContractSeq}`;
+    const category = classifyCategory(record.object);
+    const signedAt = record.publishedAt ?? new Date().toISOString();
+    const deadline = new Date(new Date(signedAt).getTime() + 365 * 24 * 3600 * 1000).toISOString();
+
+    const contract: Contract = {
+      id: contractId,
+      number: record.pncpId ? String(record.pncpId).slice(-14) : `PNCP-${realContractSeq}`,
+      agencyId,
+      municipalityId: muni.id,
+      companyId,
+      object: record.object,
+      category,
+      originalValue: record.value,
+      currentValue: record.value,
+      signedAt,
+      deadline,
+      status: "Vigente",
+      amendments: [],
+      payments: [],
+      medianComparable: 0,
+      source: "pncp",
+    };
+    contracts.push(contract);
+    contractById.set(contractId, contract);
+    categoryValueSamples[category].push(record.value);
+  }
+
+  if (realContractSeq > 0) {
+    console.log(`[fiscaliza] ${realContractSeq} contrato(s) real(is) do PNCP incorporados à base.`);
   }
 
   // Fill median comparable now that category samples are complete

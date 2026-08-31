@@ -1,0 +1,10 @@
+{
+  "generatedAt": null,
+  "source": null,
+  "dateRange": null,
+  "modalitiesQueried": [],
+  "records": [],
+  "stats": { "entitiesQueried": 0, "recordsFetched": 0, "entitiesWithErrors": 0 },
+  "errors": [],
+  "rawSampleByScope": {}
+}

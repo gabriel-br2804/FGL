@@ -59,7 +59,14 @@ export default function CompanyPage({ params }: { params: { id: string } }) {
     <div className="container-page py-10 sm:py-14">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <span className="section-label">Empresa</span>
+          <div className="flex items-center gap-2">
+            <span className="section-label">Empresa</span>
+            {company.source === "pncp" ? (
+              <span className="badge bg-signal-greenBg text-signal-green">Dado real · PNCP</span>
+            ) : (
+              <span className="badge bg-ink-900/5 text-ink-500">Dado simulado (MVP)</span>
+            )}
+          </div>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-navy-900 sm:text-4xl">{company.name}</h1>
           <dl className="mt-3 grid grid-cols-2 gap-x-8 gap-y-1 text-sm text-ink-600 sm:grid-cols-4">
             <div>
@@ -72,7 +79,7 @@ export default function CompanyPage({ params }: { params: { id: string } }) {
             </div>
             <div>
               <dt className="text-ink-400">Data de abertura</dt>
-              <dd>{fmtDate(company.openedAt)}</dd>
+              <dd>{company.openedAtKnown === false ? "Não disponível nesta fonte" : fmtDate(company.openedAt)}</dd>
             </div>
             <div>
               <dt className="text-ink-400">Município (sede)</dt>

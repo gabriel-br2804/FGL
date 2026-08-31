@@ -64,6 +64,18 @@ export default function DadosPage() {
       </div>
 
       <div className="mt-12 card p-6">
+        <h2 className="text-lg font-bold text-navy-900">Trazendo dados reais</h2>
+        <p className="mt-2 text-sm text-ink-700">
+          O repositório inclui um pipeline de ingestão (<code className="font-mono text-xs">npm run ingest</code>)
+          que busca municípios e população reais no <strong>IBGE</strong> e contratos/licitações reais no{" "}
+          <strong>PNCP</strong> — a fonte que cobre município, estado e União no mesmo formato. Rode localmente (ou
+          num CI com acesso à internet) para substituir os números simulados abaixo por dados reais onde a coleta
+          tiver sucesso. Ver <a href="/fontes" className="text-signal-blue hover:underline">Fontes de dados</a> para o
+          status atual.
+        </p>
+      </div>
+
+      <div className="mt-6 card p-6">
         <h2 className="text-lg font-bold text-navy-900">API pública (roadmap)</h2>
         <p className="mt-2 text-sm text-ink-700">
           Assim como o Portal da Transparência e o Compras.gov.br, o Fiscaliza pretende expor seus próprios dados
