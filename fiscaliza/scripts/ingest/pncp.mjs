@@ -52,6 +52,32 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+function buildPayload({ allTargets, allRecords, sourceErrors, rawSamplesByScope, supplierLookupTargets, resultadosErrors, resultadosRawSamples }) {
+  return {
+    generatedAt: new Date().toISOString(),
+    source: "PNCP — Portal Nacional de Contratações Públicas (API de Consulta)",
+    dateRange: dateRange(),
+    modalitiesQueried: MODALITIES.map((m) => m.label),
+    records: allRecords,
+    stats: {
+      entitiesQueried: allTargets.length,
+      recordsFetched: allRecords.length,
+      entitiesWithErrors: sourceErrors.length,
+      supplierLookupsAttempted: supplierLookupTargets.length,
+      supplierLookupsResolved: supplierLookupTargets.filter((r) => r.supplierCnpj).length,
+    },
+    errors: sourceErrors,
+    resultadosErrors,
+    rawSampleByScope: rawSamplesByScope,
+    resultadosRawSample: resultadosRawSamples,
+  };
+}
+
+async function writePayload(payload) {
+  await mkdir(OUT_DIR, { recursive: true });
+  await writeFile(path.join(OUT_DIR, "contracts.json"), JSON.stringify(payload, null, 2));
+}
+
 function formatDateYYYYMMDD(d) {
   return d.toISOString().slice(0, 10).replace(/-/g, "");
 }
@@ -117,7 +143,7 @@ function normalizeRecord(raw, scope) {
 async function fetchSupplierForRecord(record) {
   if (!record.agencyCnpj || !record.anoCompra || !record.sequencialCompra) return null;
   const url = `https://pncp.gov.br/api/consulta/v1/orgaos/${record.agencyCnpj}/compras/${record.anoCompra}/${record.sequencialCompra}/resultados`;
-  const res = await fetchJson(url, { label: `PNCP resultados ${record.pncpId}`, retries: 3, retryDelayMs: 3000, timeoutMs: 30_000 });
+  const res = await fetchJson(url, { label: `PNCP resultados ${record.pncpId}`, retries: 2, retryDelayMs: 2000, timeoutMs: 25_000 });
   await sleep(DELAY_BETWEEN_REQUESTS_MS);
   if (!res.ok) return { error: res.error };
 
@@ -153,12 +179,17 @@ async function queryEntity({ uf, codigoMunicipioIbge, scopeLabel }) {
       const url = `https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?${params.toString()}`;
       const res = await fetchJson(url, {
         label: `PNCP ${scopeLabel} · ${modality.label} · pág ${pagina}`,
-        retries: 4,
-        retryDelayMs: 3000,
+        // Menos tentativas: numa entidade persistentemente lenta/instável,
+        // 4 retries x 35s de timeout podia significar minutos só numa
+        // chamada. Falhar mais rápido e seguir para a próxima entidade vale
+        // mais que insistir — o erro fica registrado em errors[] de qualquer
+        // forma.
+        retries: 2,
+        retryDelayMs: 2500,
         // Municípios muito grandes (ex.: São Paulo, Rio de Janeiro) têm
         // volume alto o bastante para o PNCP demorar mais que os 20s
         // padrão para responder — confirmado numa execução real.
-        timeoutMs: 35_000,
+        timeoutMs: 30_000,
       });
       await sleep(DELAY_BETWEEN_REQUESTS_MS);
 
@@ -240,48 +271,60 @@ export async function ingestPncp(targets) {
     .sort((a, b) => b.value - a.value)
     .slice(0, SUPPLIER_LOOKUP_LIMIT);
 
+  // Checkpoint: grava o que já foi coletado ANTES de começar a fase de
+  // busca de fornecedor (mais lenta e menos testada contra a API real). Se
+  // o processo for interrompido dali pra frente, o progresso do passo
+  // principal não se perde — só falta o enriquecimento de fornecedor, que
+  // fica pra próxima execução.
+  await writePayload(
+    buildPayload({
+      allTargets,
+      allRecords,
+      sourceErrors,
+      rawSamplesByScope,
+      supplierLookupTargets,
+      resultadosErrors: [],
+      resultadosRawSamples: [],
+    })
+  );
+  console.log(`[ingest] checkpoint gravado em src/lib/data/real/contracts.json (antes da busca de fornecedor).`);
+
   const resultadosRawSamples = [];
   const resultadosErrors = [];
   if (supplierLookupTargets.length > 0) {
     console.log(`[ingest] buscando fornecedor real de ${supplierLookupTargets.length} contrato(s) de município (maior valor primeiro)...`);
     let resolved = 0;
+    let processed = 0;
     for (const record of supplierLookupTargets) {
       const result = await fetchSupplierForRecord(record);
-      if (!result) continue;
-      if (result.error) {
-        resultadosErrors.push({ pncpId: record.pncpId, error: result.error });
-        continue;
+      processed++;
+      if (result) {
+        if (result.error) {
+          resultadosErrors.push({ pncpId: record.pncpId, error: result.error });
+        } else {
+          if (result.supplierCnpj) {
+            record.supplierCnpj = result.supplierCnpj;
+            record.supplierName = result.supplierName;
+            resolved++;
+          }
+          if (resultadosRawSamples.length < 2 && result.rawSample) resultadosRawSamples.push(result.rawSample);
+        }
       }
-      if (result.supplierCnpj) {
-        record.supplierCnpj = result.supplierCnpj;
-        record.supplierName = result.supplierName;
-        resolved++;
+      // Checkpoint intermediário a cada 10 itens: essa fase é a menos
+      // testada contra a API real e a mais lenta (uma chamada por
+      // registro) — interromper no meio não deve perder o que já foi
+      // resolvido até aqui.
+      if (processed % 10 === 0) {
+        await writePayload(
+          buildPayload({ allTargets, allRecords, sourceErrors, rawSamplesByScope, supplierLookupTargets, resultadosErrors, resultadosRawSamples })
+        );
       }
-      if (resultadosRawSamples.length < 2 && result.rawSample) resultadosRawSamples.push(result.rawSample);
     }
     console.log(`[ingest] fornecedor real encontrado em ${resolved}/${supplierLookupTargets.length} contrato(s) consultados.`);
   }
 
-  await mkdir(OUT_DIR, { recursive: true });
-  const payload = {
-    generatedAt: new Date().toISOString(),
-    source: "PNCP — Portal Nacional de Contratações Públicas (API de Consulta)",
-    dateRange: dateRange(),
-    modalitiesQueried: MODALITIES.map((m) => m.label),
-    records: allRecords,
-    stats: {
-      entitiesQueried: allTargets.length,
-      recordsFetched: allRecords.length,
-      entitiesWithErrors: sourceErrors.length,
-      supplierLookupsAttempted: supplierLookupTargets.length,
-      supplierLookupsResolved: supplierLookupTargets.filter((r) => r.supplierCnpj).length,
-    },
-    errors: sourceErrors,
-    resultadosErrors,
-    rawSampleByScope: rawSamplesByScope,
-    resultadosRawSample: resultadosRawSamples,
-  };
-  await writeFile(path.join(OUT_DIR, "contracts.json"), JSON.stringify(payload, null, 2));
+  const payload = buildPayload({ allTargets, allRecords, sourceErrors, rawSamplesByScope, supplierLookupTargets, resultadosErrors, resultadosRawSamples });
+  await writePayload(payload);
   console.log(`[ingest] escrito em src/lib/data/real/contracts.json`);
   return payload;
 }
