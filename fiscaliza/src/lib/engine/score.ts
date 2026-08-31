@@ -6,6 +6,7 @@
  * "ponto de atenção" é sempre humana.
  */
 import type { Contract, Bid, Company, Municipality, FiscalizaScoreBreakdown, SignalType } from "../types";
+import { APP_NOW } from "../now";
 
 export const FACTOR_DEFINITIONS: { key: SignalType; label: string; maxPoints: number; description: string }[] = [
   {
@@ -69,7 +70,7 @@ interface ScoreInputs {
   companyAges?: { ageMonths: number; shareOfValue: number }[]; // for empresa_recente at aggregate level
 }
 
-export function computeFactorPoints(input: ScoreInputs, now = new Date("2026-08-31")) {
+export function computeFactorPoints(input: ScoreInputs, now = APP_NOW) {
   const { contracts, bids } = input;
 
   // 1. Preço fora do padrão
@@ -158,7 +159,7 @@ export function computeFactorPoints(input: ScoreInputs, now = new Date("2026-08-
 }
 
 export function buildBreakdown(
-  targetType: "company" | "municipality",
+  targetType: FiscalizaScoreBreakdown["targetType"],
   targetId: string,
   points: Record<SignalType, number>
 ): FiscalizaScoreBreakdown {
@@ -176,7 +177,7 @@ export function buildBreakdown(
   return { targetType, targetId, total, factors, computedAt: "2026-08-31T00:00:00-03:00" };
 }
 
-export function scoreCompany(company: Company, contracts: Contract[], bids: Bid[], now = new Date("2026-08-31")) {
+export function scoreCompany(company: Company, contracts: Contract[], bids: Bid[], now = APP_NOW) {
   const totalValue = contracts.reduce((s, c) => s + c.currentValue, 0);
   const ageMonths = ageInMonths(company.openedAt, now);
   // Empresas reais (PNCP) sem data de abertura conhecida não podem ser
@@ -192,8 +193,12 @@ export function scoreCompany(company: Company, contracts: Contract[], bids: Bid[
   return buildBreakdown("company", company.id, points);
 }
 
-export function scoreMunicipality(
-  muni: Municipality,
+/** Score genérico a partir de um conjunto de contratos/licitações — usado
+ * para município, estado (todos os contratos das cidades da UF) e União
+ * (todos os contratos do país). O cálculo é o mesmo em qualquer escala. */
+export function scoreAggregate(
+  targetType: FiscalizaScoreBreakdown["targetType"],
+  targetId: string,
   contracts: Contract[],
   bids: Bid[],
   companyAgeById: Map<string, number>
@@ -206,5 +211,22 @@ export function scoreMunicipality(
     shareOfValue: totalValue > 0 ? value / totalValue : 0,
   }));
   const points = computeFactorPoints({ contracts, bids, agencyShareLookup: () => 0, companyAges });
-  return buildBreakdown("municipality", muni.id, points);
+  return buildBreakdown(targetType, targetId, points);
+}
+
+export function scoreMunicipality(
+  muni: Municipality,
+  contracts: Contract[],
+  bids: Bid[],
+  companyAgeById: Map<string, number>
+) {
+  return scoreAggregate("municipality", muni.id, contracts, bids, companyAgeById);
+}
+
+export function scoreState(stateId: string, contracts: Contract[], bids: Bid[], companyAgeById: Map<string, number>) {
+  return scoreAggregate("state", stateId, contracts, bids, companyAgeById);
+}
+
+export function scoreUniao(contracts: Contract[], bids: Bid[], companyAgeById: Map<string, number>) {
+  return scoreAggregate("uniao", "uniao", contracts, bids, companyAgeById);
 }

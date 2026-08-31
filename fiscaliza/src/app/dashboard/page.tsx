@@ -4,6 +4,7 @@ import { ScoreBadge } from "@/components/ScoreBadge";
 import { DataTable } from "@/components/DataTable";
 import { getDashboardStats, getMunicipalityRanking, getTopCompaniesByScore, listDataSources } from "@/lib/data";
 import { fmtBRLCompact, fmtDate, fmtNumber } from "@/lib/engine/format";
+import { ImpostometroCard } from "@/components/ImpostometroCard";
 
 export const metadata = { title: "Dashboard — Fiscaliza" };
 
@@ -29,6 +30,10 @@ export default function DashboardPage() {
         <StatCard value={fmtNumber(stats.totalSuppliers)} label="de fornecedores" />
         <StatCard value={fmtNumber(stats.totalAttentionPoints)} label="pontos de atenção identificados" accent="amber" />
         <StatCard value={fmtNumber(stats.totalAgencies)} label="órgãos monitorados" />
+      </div>
+
+      <div className="mt-8">
+        <ImpostometroCard />
       </div>
 
       <div className="mt-12 grid gap-8 lg:grid-cols-5">

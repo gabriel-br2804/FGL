@@ -5,10 +5,10 @@ import { fmtDate } from "@/lib/engine/format";
 export const metadata = { title: "Fontes de dados — Fiscaliza" };
 
 const ROADMAP = [
+  "SICONFI (Tesouro Nacional) para orçamento e execução orçamentária oficiais por função (saúde, educação...), complementando a distribuição por área hoje derivada dos contratos",
   "Tribunais de Contas estaduais (demais UFs, além de SP) — sanções e julgamento de contas",
   "Cobertura de PNCP para todos os ~5.570 municípios (hoje: os maiores por população)",
   "Detalhamento de aditivos e pagamentos por contrato via PNCP (endpoint de atualizações)",
-  "Quadro societário (sócios) de empresas via Receita Federal/CNPJ",
   "Cadastros de sanções (CEIS, CNEP, CEPIM)",
 ];
 
@@ -45,7 +45,7 @@ export default function FontesPage() {
             <span className="text-xs text-ink-500">Última execução: {fmtDate(real.generatedAt)}</span>
           )}
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <StatusPill ok={real.ibge.ok} label={real.ibge.ok ? "IBGE conectado" : "IBGE não executado"} />
             <p className="mt-2 text-xs text-ink-500">
@@ -60,6 +60,14 @@ export default function FontesPage() {
               {real.pncp.ok
                 ? `${real.pncp.recordsFetched} contrato(s) reais coletados de ${real.pncp.entitiesQueried} entidade(s) (municípios, estados e União).`
                 : "Contratos, fornecedores e valores ainda são simulados."}
+            </p>
+          </div>
+          <div>
+            <StatusPill ok={real.cnpj.ok} label={real.cnpj.ok ? "BrasilAPI conectado" : "BrasilAPI não executado"} />
+            <p className="mt-2 text-xs text-ink-500">
+              {real.cnpj.ok
+                ? `${real.cnpj.resolved}/${real.cnpj.requested} empresas com razão social, data de abertura e sócios reais da Receita Federal.`
+                : "Nome, data de abertura e sócios das empresas reais ainda vêm só do texto digitado no PNCP."}
             </p>
           </div>
           <div>
@@ -127,7 +135,15 @@ export default function FontesPage() {
             Em paralelo aos conectores, o pipeline de ingestão real (<code className="font-mono text-xs">npm run ingest</code>)
             usa a API de Localidades/Agregados do <strong>IBGE</strong> e a API de Consulta do <strong>PNCP</strong>{" "}
             — a única fonte que cobre município, estado e União no mesmo formato desde a Lei 14.133/2021 — para
-            popular municípios, população e contratos reais.
+            popular municípios, população e contratos reais. Para cada fornecedor identificado no PNCP, a{" "}
+            <strong>BrasilAPI</strong> (espelho gratuito da Receita Federal) confirma razão social, data de abertura,
+            situação cadastral, CNAE e sócios — é o que garante que nome, CNPJ e data de fundação da empresa exibidos
+            são os oficiais, não apenas o texto digitado no processo de contratação.
+          </p>
+          <p className="mt-4 text-sm text-ink-700">
+            O <strong>Impostômetro</strong> exibido no Dashboard e na página da União é um widget do site oficial
+            (impostometro.com.br, mantido pela ACSP/IBPT) incorporado via iframe — não é uma fonte que o Fiscaliza
+            consulta ou processa, apenas um contador de arrecadação em tempo real de terceiros.
           </p>
         </div>
 

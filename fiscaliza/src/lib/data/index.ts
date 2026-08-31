@@ -1,7 +1,8 @@
 import { getDB } from "./generate";
-import { scoreCompany, scoreMunicipality } from "../engine/score";
+import { scoreCompany, scoreMunicipality, scoreState, scoreUniao } from "../engine/score";
 import { buildSignalsForCompany, buildSignalsForMunicipality } from "../engine/signals";
 import { REAL_CONTRACTS, REAL_FEDERAL, REAL_MANIFEST, REAL_GEO } from "./real-data";
+import { APP_NOW } from "../now";
 import type {
   Municipality,
   Company,
@@ -13,11 +14,14 @@ import type {
   RiskSignal,
   FiscalizaScoreBreakdown,
   DataSource,
+  SpendingArea,
 } from "../types";
 
 interface Enriched {
   companyScores: Map<string, FiscalizaScoreBreakdown>;
   municipalityScores: Map<string, FiscalizaScoreBreakdown>;
+  stateScores: Map<string, FiscalizaScoreBreakdown>;
+  uniaoScore: FiscalizaScoreBreakdown;
   companySignals: Map<string, RiskSignal[]>;
   municipalitySignals: Map<string, RiskSignal[]>;
   allSignals: RiskSignal[];
@@ -26,7 +30,7 @@ interface Enriched {
 function computeEnriched(): Enriched {
   const db = getDB();
   const companyAgeById = new Map<string, number>();
-  const now = new Date("2026-08-31");
+  const now = APP_NOW;
   for (const c of db.companies) {
     companyAgeById.set(c.id, (now.getTime() - new Date(c.openedAt).getTime()) / (30.44 * 24 * 3600 * 1000));
   }
@@ -70,7 +74,17 @@ function computeEnriched(): Enriched {
     muni.attentionPoints = attentionPoints;
   }
 
-  return { companyScores, municipalityScores, companySignals, municipalitySignals, allSignals };
+  const stateScores = new Map<string, FiscalizaScoreBreakdown>();
+  for (const state of db.states) {
+    const munisInState = db.municipalities.filter((m) => m.stateId === state.id);
+    const muniIds = new Set(munisInState.map((m) => m.id));
+    const contracts = db.contracts.filter((c) => muniIds.has(c.municipalityId));
+    const bids = db.bids.filter((b) => contracts.some((c) => c.bidId === b.id));
+    stateScores.set(state.id, scoreState(state.id, contracts, bids, companyAgeById));
+  }
+  const uniaoScore = scoreUniao(db.contracts, db.bids, companyAgeById);
+
+  return { companyScores, municipalityScores, stateScores, uniaoScore, companySignals, municipalitySignals, allSignals };
 }
 
 // Calculado uma única vez na primeira avaliação deste módulo (por processo/
@@ -167,6 +181,7 @@ export function listDataSources(): DataSource[] {
 export interface RealDataStatus {
   ibge: { ok: boolean; statesFetched: number; municipalitiesFetched: number };
   pncp: { ok: boolean; recordsFetched: number; entitiesQueried: number };
+  cnpj: { ok: boolean; requested: number; resolved: number };
   portalTransparencia: { ok: boolean; contractsFetched: number; skipped: boolean; reason?: string };
   generatedAt: string | null;
 }
@@ -182,6 +197,11 @@ export function getRealDataStatus(): RealDataStatus {
       ok: REAL_MANIFEST.pncp.ok,
       recordsFetched: REAL_MANIFEST.pncp.recordsFetched ?? 0,
       entitiesQueried: REAL_MANIFEST.pncp.entitiesQueried ?? 0,
+    },
+    cnpj: {
+      ok: REAL_MANIFEST.cnpj?.ok ?? false,
+      requested: REAL_MANIFEST.cnpj?.requested ?? 0,
+      resolved: REAL_MANIFEST.cnpj?.resolved ?? 0,
     },
     portalTransparencia: {
       ok: REAL_MANIFEST.portalTransparencia.ok,
@@ -227,6 +247,12 @@ export function getCompanyScore(id: string): FiscalizaScoreBreakdown | undefined
 }
 export function getMunicipalityScore(id: string): FiscalizaScoreBreakdown | undefined {
   return getEnriched().municipalityScores.get(id);
+}
+export function getStateScore(stateId: string): FiscalizaScoreBreakdown | undefined {
+  return getEnriched().stateScores.get(stateId.toUpperCase());
+}
+export function getUniaoScore(): FiscalizaScoreBreakdown {
+  return getEnriched().uniaoScore;
 }
 export function getCompanySignals(id: string): RiskSignal[] {
   return getEnriched().companySignals.get(id) ?? [];
@@ -328,14 +354,95 @@ export function getTopCompaniesByScore(limit = 10): Company[] {
   return [...getDB().companies].sort((a, b) => b.fiscalizaScore - a.fiscalizaScore).slice(0, limit);
 }
 
-export function suppliersForMunicipality(id: string, limit = 10) {
-  const contracts = contractsForMunicipality(id);
+function topSuppliersForContracts(contracts: Contract[], limit: number) {
   const byCompany = new Map<string, number>();
   for (const c of contracts) byCompany.set(c.companyId, (byCompany.get(c.companyId) ?? 0) + c.currentValue);
   return Array.from(byCompany.entries())
     .map(([companyId, value]) => ({ company: getCompany(companyId)!, value }))
     .sort((a, b) => b.value - a.value)
     .slice(0, limit);
+}
+
+export function suppliersForMunicipality(id: string, limit = 10) {
+  return topSuppliersForContracts(contractsForMunicipality(id), limit);
+}
+
+export function contractsForState(stateId: string): Contract[] {
+  const muniIds = new Set(listMunicipalitiesByState(stateId).map((m) => m.id));
+  return getDB().contracts.filter((c) => muniIds.has(c.municipalityId));
+}
+
+export function suppliersForState(stateId: string, limit = 10) {
+  return topSuppliersForContracts(contractsForState(stateId), limit);
+}
+
+export function suppliersForNation(limit = 10) {
+  return topSuppliersForContracts(getDB().contracts, limit);
+}
+
+export function projectsForState(stateId: string): Project[] {
+  const muniIds = new Set(listMunicipalitiesByState(stateId).map((m) => m.id));
+  return getDB().projects.filter((p) => muniIds.has(p.municipalityId));
+}
+
+function aggregateSpendingByArea(municipalities: Municipality[]): { area: SpendingArea; value: number }[] {
+  const totals = new Map<SpendingArea, number>();
+  for (const m of municipalities) {
+    for (const s of m.spendingByArea) totals.set(s.area, (totals.get(s.area) ?? 0) + s.value);
+  }
+  return Array.from(totals.entries()).map(([area, value]) => ({ area, value }));
+}
+
+function aggregateSpendingHistory(municipalities: Municipality[]): { year: number; value: number }[] {
+  const byYear = new Map<number, number>();
+  for (const m of municipalities) {
+    for (const h of m.spendingHistory) byYear.set(h.year, (byYear.get(h.year) ?? 0) + h.value);
+  }
+  return Array.from(byYear.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([year, value]) => ({ year, value }));
+}
+
+export function getStateSpendingByArea(stateId: string) {
+  return aggregateSpendingByArea(listMunicipalitiesByState(stateId));
+}
+export function getStateSpendingHistory(stateId: string) {
+  return aggregateSpendingHistory(listMunicipalitiesByState(stateId));
+}
+export function getNationalSpendingByArea() {
+  return aggregateSpendingByArea(getDB().municipalities);
+}
+export function getNationalSpendingHistory() {
+  return aggregateSpendingHistory(getDB().municipalities);
+}
+
+/** Visão completa de um estado, para a página /estados/[uf]. */
+export function getStateDetail(stateId: string) {
+  const aggregate = getStateAggregate(stateId);
+  if (!aggregate) return undefined;
+  return {
+    ...aggregate,
+    spendingByArea: getStateSpendingByArea(stateId),
+    spendingHistory: getStateSpendingHistory(stateId),
+    score: getStateScore(stateId)!,
+    topSuppliers: suppliersForState(stateId, 8),
+    projects: projectsForState(stateId),
+    contracts: contractsForState(stateId),
+  };
+}
+
+/** Visão completa da União, para a página /uniao. */
+export function getUniaoDetail() {
+  const aggregate = getUniaoAggregate();
+  return {
+    ...aggregate,
+    spendingByArea: getNationalSpendingByArea(),
+    spendingHistory: getNationalSpendingHistory(),
+    score: getUniaoScore(),
+    topSuppliers: suppliersForNation(8),
+    projects: getDB().projects,
+    contracts: getDB().contracts,
+  };
 }
 
 export function agencySupplierBreakdown(agencyId: string) {

@@ -1,5 +1,6 @@
 import type { Contract, Bid, Company, Municipality, RiskSignal } from "../types";
 import { fmtBRL, fmtPercent, fmtDate } from "./format";
+import { APP_NOW } from "../now";
 
 let seq = 0;
 function nextId() {
@@ -19,7 +20,7 @@ export function buildSignalsForCompany(
   municipalityName: (id: string) => string
 ): RiskSignal[] {
   const signals: RiskSignal[] = [];
-  const now = new Date("2026-08-31");
+  const now = APP_NOW;
 
   // Preço fora do padrão
   for (const c of contracts) {

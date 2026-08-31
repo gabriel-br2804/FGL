@@ -23,6 +23,7 @@ import { fileURLToPath } from "node:url";
 import { ingestIbge } from "./ibge.mjs";
 import { ingestPncp } from "./pncp.mjs";
 import { ingestPortalTransparencia } from "./portalTransparencia.mjs";
+import { ingestCnpj } from "./cnpj.mjs";
 import { logSection } from "./lib/http.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -50,18 +51,20 @@ async function main() {
   console.log(`\n[ingest] ${principais.length} município(s) selecionados para consulta detalhada de contratos (maiores por população).`);
 
   const pncp = await ingestPncp({ municipalities: principais, states: geo.states });
+  const cnpj = await ingestCnpj(pncp);
   const federal = await ingestPortalTransparencia();
 
-  await writeManifest({ geo, pncp, federal, principaisCount: principais.length });
+  await writeManifest({ geo, pncp, cnpj, federal, principaisCount: principais.length });
 
   logSection("Resumo");
   console.log(`IBGE:                 ${geo.municipalities.length} municípios, ${geo.states.length} estados`);
   console.log(`PNCP:                 ${pncp.stats.recordsFetched} registros reais (${pncp.stats.entitiesWithErrors} entidades com erro)`);
+  console.log(`BrasilAPI (CNPJ):     ${cnpj.stats.resolved}/${cnpj.stats.requested} empresas enriquecidas com dados da Receita Federal`);
   console.log(`Portal Transparência: ${federal.skipped ? "pulado (" + federal.reason + ")" : federal.contracts.length + " contratos federais"}`);
   console.log(`\nPronto. Rode "npm run dev" e confira /fontes para ver o status de cada fonte.`);
 }
 
-async function writeManifest({ geo, pncp, federal, principaisCount }) {
+async function writeManifest({ geo, pncp, cnpj, federal, principaisCount }) {
   await mkdir(OUT_DIR, { recursive: true });
   const manifest = {
     generatedAt: new Date().toISOString(),
@@ -70,6 +73,9 @@ async function writeManifest({ geo, pncp, federal, principaisCount }) {
       : { ok: false },
     pncp: pncp
       ? { ok: pncp.stats.recordsFetched > 0, recordsFetched: pncp.stats.recordsFetched, entitiesQueried: pncp.stats.entitiesQueried, entitiesWithErrors: pncp.stats.entitiesWithErrors }
+      : { ok: false, skipped: true },
+    cnpj: cnpj
+      ? { ok: cnpj.stats.resolved > 0, requested: cnpj.stats.requested, resolved: cnpj.stats.resolved }
       : { ok: false, skipped: true },
     portalTransparencia: federal
       ? federal.skipped

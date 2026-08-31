@@ -102,9 +102,14 @@ export function MapExplorer({
         <div className="lg:col-span-2">
           {scope === "uniao" && (
             <div className="card space-y-4 p-6">
-              <div>
-                <span className="data-label">União</span>
-                <h3 className="text-xl font-bold text-navy-900">Governo Federal</h3>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <span className="data-label">União</span>
+                  <h3 className="text-xl font-bold text-navy-900">Governo Federal</h3>
+                </div>
+                <Link href="/uniao" className="text-sm font-medium text-signal-blue hover:underline">
+                  Ver página completa →
+                </Link>
               </div>
               <dl className="grid grid-cols-2 gap-4 text-sm">
                 <div>
@@ -145,13 +150,18 @@ export function MapExplorer({
 
           {scope === "estado" && selected && (
             <div className="card space-y-4 p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <div>
                   <span className="data-label">Estado</span>
                   <h3 className="text-xl font-bold text-navy-900">{selected.state.name}</h3>
                 </div>
-                <ScoreBadge score={selected.avgScore} size="sm" />
+                <div className="flex items-center gap-3">
+                  <ScoreBadge score={selected.avgScore} size="sm" />
+                </div>
               </div>
+              <Link href={`/estados/${selected.state.id.toLowerCase()}`} className="inline-block text-sm font-medium text-signal-blue hover:underline">
+                Ver página completa do estado →
+              </Link>
               <dl className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <dt className="text-ink-500">Gastos analisados</dt>

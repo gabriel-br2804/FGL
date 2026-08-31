@@ -231,7 +231,7 @@ export interface RiskSignal {
 }
 
 export interface FiscalizaScoreBreakdown {
-  targetType: "company" | "municipality";
+  targetType: "company" | "municipality" | "state" | "uniao";
   targetId: string;
   total: number;
   factors: { key: SignalType; label: string; points: number; maxPoints: number }[];

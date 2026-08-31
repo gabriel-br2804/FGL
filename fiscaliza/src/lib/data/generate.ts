@@ -10,7 +10,8 @@ import {
   AMENDMENT_REASONS,
 } from "./companies-seed";
 import { rngFor, pick, randInt, randFloat, weighted, hashString } from "./rng";
-import { REAL_GEO, REAL_CONTRACTS, classifyCategory, type RealMunicipio } from "./real-data";
+import { REAL_GEO, REAL_CONTRACTS, REAL_COMPANIES, classifyCategory, formatCnpj, mapSituacaoCadastral, type RealMunicipio } from "./real-data";
+import { APP_NOW, APP_NOW_MS } from "../now";
 import type {
   Municipality,
   State,
@@ -181,7 +182,7 @@ function buildDatabase(): Database {
     const hq = pick(rand, MUNICIPALITIES);
     const isRecent = rand() < 0.16;
     const openedAt = isRecent
-      ? new Date(Date.now() - randInt(rand, 60, 640) * 24 * 3600 * 1000).toISOString()
+      ? new Date(APP_NOW_MS - randInt(rand, 60, 640) * 24 * 3600 * 1000).toISOString()
       : new Date(
           randInt(rand, 1992, 2020),
           randInt(rand, 0, 11),
@@ -422,6 +423,8 @@ function buildDatabase(): Database {
 
   let contractSeq = 0;
   let bidSeq = 0;
+  const CONTRACT_WINDOW_START_MS = new Date(2022, 0, 1).getTime();
+  const CONTRACT_WINDOW_END_MS = new Date(2026, 11, 31).getTime();
 
   function makeContractsForMunicipality(muni: Municipality, count: number, companyPool: Company[]) {
     const rand = rngFor(`contracts-${muni.id}`);
@@ -445,11 +448,13 @@ function buildDatabase(): Database {
 
       bidSeq++;
       const bidId = `bid-${bidSeq}`;
-      const openedAt = new Date(
-        randInt(rand, 2022, 2026),
-        randInt(rand, 0, 11),
-        randInt(rand, 1, 28)
-      ).toISOString();
+      // Uma empresa nunca pode ter assinado um contrato antes de existir —
+      // a data do contrato é sorteada dentro de [max(início da janela,
+      // abertura da empresa), fim da janela], nunca antes da fundação.
+      const companyOpenedMs = company.openedAtKnown === false ? CONTRACT_WINDOW_START_MS : new Date(company.openedAt).getTime();
+      const earliestMs = Math.max(CONTRACT_WINDOW_START_MS, companyOpenedMs);
+      const openedAtMs = earliestMs >= CONTRACT_WINDOW_END_MS ? CONTRACT_WINDOW_END_MS : randFloat(rand, earliestMs, CONTRACT_WINDOW_END_MS);
+      const openedAt = new Date(openedAtMs).toISOString();
       const object = pick(rand, CONTRACT_OBJECTS[category]);
 
       const bid: Bid = {
@@ -536,7 +541,7 @@ function buildDatabase(): Database {
         currentValue,
         signedAt: openedAt,
         deadline,
-        status: new Date(deadline) < new Date("2026-08-31") ? (rand() < 0.85 ? "Encerrado" : "Rescindido") : "Vigente",
+        status: new Date(deadline) < APP_NOW ? (rand() < 0.85 ? "Encerrado" : "Rescindido") : "Vigente",
         amendments,
         payments,
         medianComparable: 0, // filled after all contracts are generated
@@ -599,21 +604,33 @@ function buildDatabase(): Database {
     let companyId = cnpjDigits ? realCompanyIdByCnpj.get(cnpjDigits) : undefined;
     if (!companyId) {
       companyId = cnpjDigits ? `pncp-${cnpjDigits}` : `pncp-desconhecido-${++realContractSeq}`;
+      // A Receita Federal (via BrasilAPI) é a fonte de verdade para nome,
+      // data de abertura e sócios — o PNCP só traz o que o órgão digitou
+      // no processo, que pode divergir da razão social oficial e nunca
+      // inclui data de fundação. É essa data real que evita o problema de
+      // "empresa com contrato anterior à própria abertura" nos dados reais.
+      const enriched = cnpjDigits ? REAL_COMPANIES.byCnpj[cnpjDigits] : undefined;
+      const situacao = enriched ? mapSituacaoCadastral(enriched.situacaoCadastral) : null;
       const company: Company = {
         id: companyId,
-        cnpj: record.supplierCnpj ?? "Não informado",
-        name: record.supplierName ?? "Fornecedor não identificado",
-        status: "Ativa",
-        openedAt: "2015-01-01T00:00:00.000Z",
-        openedAtKnown: false,
+        cnpj: cnpjDigits ? formatCnpj(cnpjDigits) : record.supplierCnpj ?? "Não informado",
+        name: enriched?.razaoSocial ?? record.supplierName ?? "Fornecedor não identificado",
+        status: situacao ?? "Ativa",
+        openedAt: enriched?.dataInicioAtividade ? new Date(enriched.dataInicioAtividade).toISOString() : "2015-01-01T00:00:00.000Z",
+        openedAtKnown: !!enriched?.dataInicioAtividade,
         municipalityId: muni.id,
-        economicActivity: "Não classificado nesta integração (dado real PNCP)",
+        economicActivity: enriched?.cnaeDescricao ?? "Não classificado nesta integração (dado real PNCP)",
         totalContracted: 0,
         contractsCount: 0,
         contractingAgenciesCount: 0,
         municipalitiesCount: 0,
         fiscalizaScore: 0,
-        partners: [],
+        partners:
+          enriched?.socios.map((s, idx) => ({
+            name: s.nome ?? "Não informado",
+            role: s.qualificacao ?? "Sócio",
+            personId: `person-pncp-${cnpjDigits}-${idx}`,
+          })) ?? [],
         yearlyContracted: [],
         source: "pncp",
       };
@@ -714,7 +731,7 @@ function buildDatabase(): Database {
     if (new Date(c.deadline) < new Date("2025-06-01")) {
       status = rand() < 0.82 ? "Concluída" : "Paralisada";
       executedPercent = status === "Concluída" ? 100 : Math.round(randFloat(rand, 20, 70));
-    } else if (new Date(c.deadline) < new Date("2026-08-31")) {
+    } else if (new Date(c.deadline) < APP_NOW) {
       status = rand() < 0.4 ? "Atrasada" : "Em execução";
     } else {
       status = rand() < 0.15 ? "Planejada" : "Em execução";

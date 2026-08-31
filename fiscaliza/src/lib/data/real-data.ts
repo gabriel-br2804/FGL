@@ -11,6 +11,7 @@ import geo from "./real/geo.json";
 import contracts from "./real/contracts.json";
 import federal from "./real/federal.json";
 import manifest from "./real/manifest.json";
+import companiesReal from "./real/companies.json";
 import type { SpendingArea } from "../types";
 
 export interface RealMunicipio {
@@ -67,9 +68,46 @@ export const REAL_MANIFEST = manifest as {
   generatedAt: string | null;
   ibge: { ok: boolean; statesFetched?: number; municipalitiesFetched?: number };
   pncp: { ok: boolean; recordsFetched?: number; entitiesQueried?: number; skipped?: boolean };
+  cnpj?: { ok: boolean; requested?: number; resolved?: number; skipped?: boolean };
   portalTransparencia: { ok: boolean; contractsFetched?: number; skipped?: boolean; reason?: string };
   principaisMunicipiosCount: number;
 };
+
+export interface RealCompanyRecord {
+  razaoSocial: string | null;
+  nomeFantasia: string | null;
+  dataInicioAtividade: string | null;
+  situacaoCadastral: string | null;
+  cnaeDescricao: string | null;
+  municipio: string | null;
+  uf: string | null;
+  socios: { nome: string | null; qualificacao: string | null }[];
+}
+
+export const REAL_COMPANIES = companiesReal as {
+  generatedAt: string | null;
+  source: string | null;
+  byCnpj: Record<string, RealCompanyRecord>;
+};
+
+/** Formata um CNPJ (só dígitos ou já formatado) no padrão XX.XXX.XXX/XXXX-XX. */
+export function formatCnpj(value: string): string {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 14) return value;
+  return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
+}
+
+const SITUACAO_MAP: Record<string, "Ativa" | "Inapta" | "Suspensa" | "Baixada"> = {
+  ATIVA: "Ativa",
+  INAPTA: "Inapta",
+  SUSPENSA: "Suspensa",
+  BAIXADA: "Baixada",
+};
+
+export function mapSituacaoCadastral(situacao: string | null): "Ativa" | "Inapta" | "Suspensa" | "Baixada" | null {
+  if (!situacao) return null;
+  return SITUACAO_MAP[situacao.toUpperCase()] ?? null;
+}
 
 export function hasRealGeoData(): boolean {
   return REAL_GEO.municipalities.length > 0;
