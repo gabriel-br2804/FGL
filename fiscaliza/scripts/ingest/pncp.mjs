@@ -117,7 +117,7 @@ function normalizeRecord(raw, scope) {
 async function fetchSupplierForRecord(record) {
   if (!record.agencyCnpj || !record.anoCompra || !record.sequencialCompra) return null;
   const url = `https://pncp.gov.br/api/consulta/v1/orgaos/${record.agencyCnpj}/compras/${record.anoCompra}/${record.sequencialCompra}/resultados`;
-  const res = await fetchJson(url, { label: `PNCP resultados ${record.pncpId}`, retries: 3, retryDelayMs: 3000 });
+  const res = await fetchJson(url, { label: `PNCP resultados ${record.pncpId}`, retries: 3, retryDelayMs: 3000, timeoutMs: 30_000 });
   await sleep(DELAY_BETWEEN_REQUESTS_MS);
   if (!res.ok) return { error: res.error };
 
@@ -155,6 +155,10 @@ async function queryEntity({ uf, codigoMunicipioIbge, scopeLabel }) {
         label: `PNCP ${scopeLabel} · ${modality.label} · pág ${pagina}`,
         retries: 4,
         retryDelayMs: 3000,
+        // Municípios muito grandes (ex.: São Paulo, Rio de Janeiro) têm
+        // volume alto o bastante para o PNCP demorar mais que os 20s
+        // padrão para responder — confirmado numa execução real.
+        timeoutMs: 35_000,
       });
       await sleep(DELAY_BETWEEN_REQUESTS_MS);
 
