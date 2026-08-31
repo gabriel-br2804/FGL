@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FAFAF8;
+  color: #0B0F14;
+}
+
+/*
+ * As classes utilitárias compostas abaixo precisam viver na camada
+ * "components" do Tailwind — caso contrário, por virem depois de
+ * `@tailwind utilities` no arquivo, o PostCSS as insere DEPOIS das
+ * utilitárias no CSS final, e uma classe como `bg-white` aplicada num
+ * <Link className="btn-primary bg-white"> perderia para o `bg-navy-900`
+ * do próprio .btn-primary (mesma especificidade, ordem de fonte decide).
+ * Com @layer components, o Tailwind garante a ordem base → components →
+ * utilities, e utilitárias soltas no JSX voltam a vencer como esperado.
+ */
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-label {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-signal-blue;
+  }
+
+  .card {
+    @apply rounded-xl2 border border-base-border bg-base-card shadow-card;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-navy-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-700 focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink-900/15 bg-white px-6 py-3 text-sm font-semibold text-ink-900 transition hover:border-ink-900/40;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+  }
+
+  .data-label {
+    @apply text-[11px] font-semibold uppercase tracking-wider text-ink-500;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::selection {
+  background: #0B1E3F;
+  color: white;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d7dad4;
+  border-radius: 999px;
+}
