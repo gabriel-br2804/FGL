@@ -45,7 +45,12 @@ export async function fetchJson(url, options = {}) {
         const bodyText = await res.text().catch(() => "");
         lastError = `HTTP ${res.status} ${res.statusText} — ${bodyText.slice(0, 300)}`;
         if (res.status === 429 || res.status >= 500) {
-          await sleep(retryDelayMs * (attempt + 1));
+          // Em 429, respeita o Retry-After do servidor quando ele manda —
+          // é bem mais confiável que adivinhar um backoff fixo.
+          const retryAfterHeader = res.headers.get("retry-after");
+          const retryAfterMs = retryAfterHeader ? Number(retryAfterHeader) * 1000 : null;
+          const delay = retryAfterMs && Number.isFinite(retryAfterMs) ? retryAfterMs : retryDelayMs * (attempt + 1);
+          await sleep(delay);
           continue;
         }
         return { ok: false, data: null, error: lastError, status: res.status };

@@ -37,7 +37,16 @@ const MODALITIES = [
 
 const DAYS_BACK = 180;
 const PAGE_SIZE_CAP = 1; // páginas por (entidade x modalidade) — controla volume/tempo
-const CONCURRENCY = 4;
+// O PNCP tem um limite de requisições bem mais apertado do que parecia à
+// primeira vista (muitos 429 num teste real com concurrency=4 e sem
+// espaçamento). Concorrência baixa + espaço entre chamadas + mais
+// tentativas com backoff é mais lento, mas chega a bem mais entidades.
+const CONCURRENCY = 2;
+const DELAY_BETWEEN_REQUESTS_MS = 700;
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
 
 function formatDateYYYYMMDD(d) {
   return d.toISOString().slice(0, 10).replace(/-/g, "");
@@ -101,7 +110,12 @@ async function queryEntity({ uf, codigoMunicipioIbge, scopeLabel }) {
       if (codigoMunicipioIbge) params.set("codigoMunicipioIbge", String(codigoMunicipioIbge));
 
       const url = `https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?${params.toString()}`;
-      const res = await fetchJson(url, { label: `PNCP ${scopeLabel} · ${modality.label} · pág ${pagina}`, retries: 1 });
+      const res = await fetchJson(url, {
+        label: `PNCP ${scopeLabel} · ${modality.label} · pág ${pagina}`,
+        retries: 4,
+        retryDelayMs: 3000,
+      });
+      await sleep(DELAY_BETWEEN_REQUESTS_MS);
 
       if (!res.ok) {
         errors.push(`${modality.label}: ${res.error}`);
