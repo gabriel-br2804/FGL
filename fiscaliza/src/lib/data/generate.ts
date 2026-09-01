@@ -709,6 +709,38 @@ function buildDatabase(): Database {
       .map(([year, value]) => ({ year, value }));
   }
 
+  // Deriva os agregados do município (gasto analisado, distribuição por área,
+  // histórico anual, nº de contratos/fornecedores) diretamente da soma dos
+  // contratos de fato atribuídos a ele — nunca de uma fórmula à parte.
+  // Antes disso, totalSpent/spendingByArea/spendingHistory vinham de uma
+  // estimativa independente baseada só em população, calculada ANTES da
+  // injeção dos contratos reais do PNCP — ou seja, o "gasto analisado"
+  // exibido não batia com a soma dos contratos realmente listados na
+  // página do município. annualBudget continua sendo uma estimativa (não
+  // há fonte real de orçamento ainda — ver roadmap do SICONFI), mas nunca
+  // fica abaixo do que foi de fato analisado.
+  for (const muni of municipalities) {
+    const own = contracts.filter((c) => c.municipalityId === muni.id);
+    const totalSpent = own.reduce((s, c) => s + c.currentValue, 0);
+    muni.totalSpent = totalSpent;
+    muni.totalContracts = own.length;
+    muni.totalSuppliers = new Set(own.map((c) => c.companyId)).size;
+    muni.annualBudget = Math.max(muni.annualBudget, Math.round(totalSpent / 0.55));
+
+    const byArea = new Map<SpendingArea, number>();
+    for (const c of own) byArea.set(c.category, (byArea.get(c.category) ?? 0) + c.currentValue);
+    muni.spendingByArea = CATEGORIES.map((area) => ({ area, value: byArea.get(area) ?? 0 }));
+
+    const byYear = new Map<number, number>();
+    for (const c of own) {
+      const y = new Date(c.signedAt).getFullYear();
+      byYear.set(y, (byYear.get(y) ?? 0) + c.currentValue);
+    }
+    muni.spendingHistory = Array.from(byYear.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([year, value]) => ({ year, value }));
+  }
+
   // Projects ("obras") — derived from Infraestrutura + some Saúde/Educação contracts with higher value
   const projects: Project[] = [];
   const projectById = new Map<string, Project>();
