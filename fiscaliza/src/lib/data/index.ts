@@ -1,7 +1,7 @@
 import { getDB } from "./generate";
-import { scoreCompany, scoreMunicipality, scoreState, scoreUniao } from "../engine/score";
+import { scoreCompany, scoreMunicipality, scoreState, scoreUniao, scoreAggregate } from "../engine/score";
 import { buildSignalsForCompany, buildSignalsForMunicipality } from "../engine/signals";
-import { REAL_CONTRACTS, REAL_FEDERAL, REAL_MANIFEST, REAL_GEO } from "./real-data";
+import { REAL_CONTRACTS, REAL_FEDERAL, REAL_MANIFEST, REAL_GEO, REAL_GOVERNANCE, type RealStateGovernance } from "./real-data";
 import { APP_NOW } from "../now";
 import type {
   Municipality,
@@ -16,6 +16,8 @@ import type {
   DataSource,
   SpendingArea,
 } from "../types";
+
+export type { RealStateGovernance };
 
 interface Enriched {
   companyScores: Map<string, FiscalizaScoreBreakdown>;
@@ -424,6 +426,72 @@ export function getNationalSpendingHistory() {
   return aggregateSpendingHistory(getDB().municipalities);
 }
 
+/** Governador, secretariado e portais oficiais do estado — dado real, mas
+ * pesquisado/curado manualmente (não vem de um ingest automático). Ver
+ * `REAL_GOVERNANCE.disclaimer`. */
+export function getStateGovernance(stateId: string): RealStateGovernance | undefined {
+  return REAL_GOVERNANCE.states[stateId.toUpperCase()];
+}
+
+export interface SecretariaDetail {
+  area: SpendingArea;
+  label: string;
+  name: string | null;
+  sourceUrl: string | null;
+  totalSpent: number;
+  contractsCount: number;
+  score: FiscalizaScoreBreakdown;
+}
+
+/** Um "Fiscaliza Score" por secretaria (área de gasto), calculado a partir
+ * dos contratos reais/simulados do estado na mesma área — mesmo motor de
+ * análise usado para município/estado/União, só que recortado por
+ * categoria. O nome do secretário (quando disponível) vem de
+ * getStateGovernance; o score em si nunca depende dele. */
+export function getStateSecretarias(stateId: string): SecretariaDetail[] {
+  getEnriched();
+  const db = getDB();
+  const contracts = contractsForState(stateId);
+  const governance = getStateGovernance(stateId);
+  const byArea = new Map<SpendingArea, Contract[]>();
+  for (const c of contracts) {
+    const arr = byArea.get(c.category) ?? [];
+    arr.push(c);
+    byArea.set(c.category, arr);
+  }
+  const areas: { area: SpendingArea; label: string }[] = governance?.secretarias.map((s) => ({ area: s.area, label: s.label })) ?? [
+    { area: "Saúde", label: "Secretaria de Saúde" },
+    { area: "Educação", label: "Secretaria de Educação" },
+    { area: "Infraestrutura", label: "Secretaria de Infraestrutura/Obras" },
+    { area: "Segurança", label: "Secretaria de Segurança Pública" },
+    { area: "Administração", label: "Secretaria de Administração/Fazenda" },
+    { area: "Transporte", label: "Secretaria de Transportes" },
+  ];
+
+  return areas.map(({ area, label }) => {
+    const areaContracts = byArea.get(area) ?? [];
+    const areaBids = db.bids.filter((b) => areaContracts.some((c) => c.bidId === b.id));
+    const ageById = new Map<string, number>();
+    for (const companyId of new Set(areaContracts.map((c) => c.companyId))) {
+      const company = db.companyById.get(companyId);
+      if (company) {
+        ageById.set(companyId, (APP_NOW.getTime() - new Date(company.openedAt).getTime()) / (30.44 * 24 * 3600 * 1000));
+      }
+    }
+    const score = scoreAggregate("state", `${stateId}-${area}`, areaContracts, areaBids, ageById);
+    const sec = governance?.secretarias.find((s) => s.area === area);
+    return {
+      area,
+      label,
+      name: sec?.name ?? null,
+      sourceUrl: sec?.sourceUrl ?? null,
+      totalSpent: areaContracts.reduce((s, c) => s + c.currentValue, 0),
+      contractsCount: areaContracts.length,
+      score,
+    };
+  });
+}
+
 /** Visão completa de um estado, para a página /estados/[uf]. */
 export function getStateDetail(stateId: string) {
   const aggregate = getStateAggregate(stateId);
@@ -436,6 +504,8 @@ export function getStateDetail(stateId: string) {
     topSuppliers: suppliersForState(stateId, 8),
     projects: projectsForState(stateId),
     contracts: contractsForState(stateId),
+    governance: getStateGovernance(stateId),
+    secretarias: getStateSecretarias(stateId),
   };
 }
 

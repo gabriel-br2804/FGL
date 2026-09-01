@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { listDataSources, getRealDataStatus } from "@/lib/data";
 import { CONNECTOR_REGISTRY } from "@/lib/connectors";
 import { fmtDate } from "@/lib/engine/format";
@@ -162,6 +163,15 @@ export default function FontesPage() {
             O <strong>Impostômetro</strong> exibido no Dashboard e na página da União é um widget do site oficial
             (impostometro.com.br, mantido pela ACSP/IBPT) incorporado via iframe — não é uma fonte que o Fiscaliza
             consulta ou processa, apenas um contador de arrecadação em tempo real de terceiros.
+          </p>
+          <p className="mt-4 text-sm text-ink-700">
+            Cada página de estado também traz governador, secretariado e Fiscaliza Score por secretaria (a partir dos
+            contratos reais/simulados classificados por área) — dado pesquisado manualmente, não vindo de um ingest
+            automático. Veja o diretório completo com os 27 estados e capitais em{" "}
+            <Link href="/portais" className="font-medium text-signal-blue hover:underline">
+              /portais
+            </Link>
+            .
           </p>
         </div>
 

@@ -1,0 +1,1518 @@
+{
+  "asOf": "2026-09-01",
+  "disclaimer": "Dados de governador, secretariado e portais pesquisados manualmente via busca na internet, com fonte oficial (URL) citada por item — não vêm de um ingest automático como IBGE/PNCP. 2026 é ano eleitoral: vários governadores renunciaram entre março e maio de 2026 para concorrer a outros cargos, gerando sucessões recentes e alta rotatividade de secretariado em vários estados. Onde a pesquisa não encontrou confirmação segura de um nome atual (ou havia conflito entre fontes), o campo foi deixado em branco propositalmente em vez de arriscar um palpite — isso é esperado e será completado em pesquisas futuras. Confira sempre a fonte citada antes de tratar um nome como definitivo.",
+  "states": {
+    "AC": {
+      "governor": {
+        "name": "Mailza Assis",
+        "party": "PP",
+        "sourceUrl": "https://acrenews.com.br/decisao-serena-escreve-o-governador-gladson-cameli-em-carta-renuncia-lida-agora-ha-pouco-na-assembleia-legislativa/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": "Ítalo Almeida Lopes",
+          "sourceUrl": "https://seop.ac.gov.br/equipe-gestora/"
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "Cel. José Américo de Souza Gaia",
+          "sourceUrl": "https://sejusp.ac.gov.br/"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": "José Amarísio Freitas de Souza",
+          "sourceUrl": "https://diariodoacre.com.br/sefaz-do-acre-integra-nova-diretoria-do-comite-nacional-dos-secretarios-de-fazenda-para-o-bienio-2025-2027/"
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://transparencia.ac.gov.br/",
+        "type": "Exportação PDF/CSV/XLS + portal de dados abertos (dados.ac.gov.br)"
+      },
+      "capital": {
+        "name": "Rio Branco",
+        "portal": {
+          "url": "https://portalcgm.riobranco.ac.gov.br/portal/",
+          "type": "não confirmado se há exportação CSV/API própria"
+        }
+      }
+    },
+    "AL": {
+      "governor": {
+        "name": "Paulo Dantas",
+        "party": "MDB",
+        "sourceUrl": "https://alagoas.al.gov.br/governo/governador-de-alagoas"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Emanuel Barbosa (interino)",
+          "sourceUrl": "https://www.saude.al.gov.br/governador-paulo-dantas-nomeia-secretario-interino-da-saude/"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Roseane Ferreira Vasconcelos",
+          "sourceUrl": "https://alagoas.al.gov.br/galeriav/roseane-vasconcelos-secretaria-de-estado-da-educacao-seduc"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": "Gustavo Alberto Acioli de Paiva Torres",
+          "sourceUrl": "https://alagoas.al.gov.br/galeriav/gustavo-acioli-secretario-de-estado-da-infraestrutura-seinfra"
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "Flávio Saraiva",
+          "sourceUrl": "https://alagoas.al.gov.br/galeriav/flavio-saraiva-secretario-de-seguranca-publica-de-alagoas"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": "Renata dos Santos",
+          "sourceUrl": "https://www.sefaz.al.gov.br/institucional/quem-e-quem"
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": "Mosart Amaral",
+          "sourceUrl": "https://alagoas.al.gov.br/galeriav/mosart-amaral-secretario-de-estado-do-transporte-e-desenvolvimento-urbano"
+        }
+      ],
+      "statePortal": {
+        "url": "https://transparencia.al.gov.br/",
+        "type": "API pública (JSON) + dados abertos (dados.al.gov.br)"
+      },
+      "capital": {
+        "name": "Maceió",
+        "portal": {
+          "url": "https://www.transparencia.maceio.al.gov.br/transparencia/",
+          "type": "dados abertos (CKAN, CSV/XLSX/JSON)"
+        }
+      }
+    },
+    "AP": {
+      "governor": {
+        "name": "Clécio Luís",
+        "party": "União Brasil",
+        "sourceUrl": "https://uniaobrasil.org.br/alcolumbre-filia-governador-do-amapa-clecio-luis-ao-uniao-brasil/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Débora Cirqueira Okabaiashi",
+          "sourceUrl": "https://agenciaamapa.com.br/noticia/24123/debora-cirqueira-okabaiashi-e-a-nova-secretaria-de-saude-do-amapa"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Paulo Lemos",
+          "sourceUrl": "https://agenciaamapa.com.br/noticia/33277/governo-do-amapa-empossa-paulo-lemos-como-novo-secretario-de-estado-da-educacao"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": "David Covre",
+          "sourceUrl": "https://seinf.portal.ap.gov.br/conteudo/institucional/perfil-dos-gestores"
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "José Lima Neto",
+          "sourceUrl": "https://sejusp.portal.ap.gov.br/"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://www.transparencia.ap.gov.br/",
+        "type": "seção de dados abertos; API não confirmada"
+      },
+      "capital": {
+        "name": "Macapá",
+        "portal": {
+          "url": "https://macapa.ap.gov.br/portal-transparencia/",
+          "type": "majoritariamente informativo/HTML"
+        }
+      }
+    },
+    "AM": {
+      "governor": {
+        "name": "Roberto Cidade",
+        "party": null,
+        "sourceUrl": "https://www.cnnbrasil.com.br/politica/apos-anunciar-que-ficaria-wilson-lima-renuncia-ao-governo-do-amazonas/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://www.transparencia.am.gov.br/",
+        "type": "API de Dados Abertos"
+      },
+      "capital": {
+        "name": "Manaus",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "BA": {
+      "governor": {
+        "name": "Jerônimo Rodrigues",
+        "party": "PT",
+        "sourceUrl": "https://pt.wikipedia.org/wiki/Gest%C3%A3o_Jer%C3%B4nimo_Rodrigues_no_governo_da_Bahia"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Salvador",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "CE": {
+      "governor": {
+        "name": "Elmano de Freitas",
+        "party": "PT",
+        "sourceUrl": "https://www.ceara.gov.br/2024/12/26/governador-elmano-de-freitas-anuncia-novos-titulares-de-secretarias-e-orgaos-vinculados/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Fortaleza",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "DF": {
+      "governor": {
+        "name": "Celina Leão",
+        "party": "PP",
+        "sourceUrl": "https://www.cl.df.gov.br/-/celina-leao-toma-posse-como-governadora-do-distrito-federal"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Juracy Cavalcante Lacerda Júnior",
+          "sourceUrl": "https://jornaldebrasilia.com.br/brasilia/juracy-cavalcante-lacerda-junior-e-o-novo-secretario-de-saude-do-df/"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Thiago Peixoto",
+          "sourceUrl": "https://www.correiobraziliense.com.br/cidades-df/2026/08/7476366-quem-e-thiago-peixoto-novo-secretario-de-educacao-do-df.html"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": "Guilherme Nery da Fonseca Coelho",
+          "sourceUrl": "https://ohoje.com/2026/07/22/celina-leao-escolhe-guilherme-nery-para-comandar-a-secretaria-de-obras-do-df/"
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "Sandro Torres Avelar",
+          "sourceUrl": "https://vice.df.gov.br/w/sandro-avelar-e-anunciado-como-secretario-de-seguranca-publica"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": "Zeno José Andrade Gonçalves",
+          "sourceUrl": "https://www.semob.df.gov.br/perfil-do-secretario"
+        }
+      ],
+      "statePortal": {
+        "url": "https://www.dados.df.gov.br/",
+        "type": "dados abertos (catálogo CKAN, CSV)"
+      },
+      "capital": {
+        "name": "Brasília",
+        "portal": {
+          "url": null,
+          "type": "mesmo portal do governo do DF (unidade federativa única)"
+        }
+      }
+    },
+    "ES": {
+      "governor": {
+        "name": "Ricardo Ferraço",
+        "party": "MDB",
+        "sourceUrl": "https://seg.es.gov.br/Not%C3%ADcia/ricardo-ferraco-toma-posse-como-governador-do-espirito-santo"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Gleikson Barbosa dos Santos",
+          "sourceUrl": "https://saude.es.gov.br/Noticia/saude-inicia-novo-ciclo-de-gestao-com-gleikson-barbosa-secretario"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Andréa Guzzo Pereira",
+          "sourceUrl": "https://sedu.es.gov.br/Noticia/andrea-guzzo-pereira-e-convidada-para-assumir-a-secretaria-da-educacao"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://transparencia.es.gov.br/",
+        "type": "dados abertos (dados.es.gov.br) com API"
+      },
+      "capital": {
+        "name": "Vitória",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "GO": {
+      "governor": {
+        "name": "Daniel Vilela",
+        "party": "MDB",
+        "sourceUrl": "https://goias.gov.br/abc/daniel-vilela-toma-posse-como-governador-de-goias/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Rasível dos Reis Santos Júnior",
+          "sourceUrl": "https://goias.gov.br/saude/vice-governador-e-secretario-da-saude-anunciam-confirmacao-de-consultas-e-exames-pelo-whats-app-09-03-2026/"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Helena da Costa Bezerra",
+          "sourceUrl": "https://aredacao.com.br/confira-todos-os-ajustes-de-daniel-vilela-no-primeiro-escalao-do-governo-de-goias/"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "Renato Brum",
+          "sourceUrl": "https://www.jornalopcao.com.br/ultimas-noticias/daniel-vilela-mantem-linha-da-seguranca-publica-adotada-por-caiado-em-goias-828273/"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": "Francisco Sérvulo Freire Nogueira",
+          "sourceUrl": "https://tribunadoplanalto.com.br/daniel-vilela-promove-mudancas-no-secretariado-e-mantem-base-tecnica-no-governo/"
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://transparencia.go.gov.br/",
+        "type": "dados abertos com API (CKAN) e CSV"
+      },
+      "capital": {
+        "name": "Goiânia",
+        "portal": {
+          "url": "https://dadosabertos.goiania.go.gov.br/",
+          "type": "dados abertos com API e CSV"
+        }
+      }
+    },
+    "MA": {
+      "governor": {
+        "name": "Carlos Brandão",
+        "party": null,
+        "sourceUrl": "https://pt.wikipedia.org/wiki/Carlos_Brand%C3%A3o_(pol%C3%ADtico)"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Liliane Neves Carvalho",
+          "sourceUrl": "https://marrapa.com/brandao-escolhe-a-farmaceutica-liliane-carvalho-para-comandar-a-ses/"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Jandira Dias Araújo Silva",
+          "sourceUrl": "https://www.educacao.ma.gov.br/"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": "Aparício Bandeira Filho",
+          "sourceUrl": "https://homol.ma.gov.br/noticias/aparicio-bandeira-reassume-a-secretaria-de-estado-da-infraestrutura-do-maranhao"
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": "Marcellus Ribeiro Alves",
+          "sourceUrl": "https://sistemas1.sefaz.ma.gov.br/portalsefaz/"
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "http://www.transparencia.ma.gov.br/",
+        "type": "API pública (REST/JSON) e dados abertos (dados.ma.gov.br)"
+      },
+      "capital": {
+        "name": "São Luís",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "MT": {
+      "governor": {
+        "name": "Otaviano Pivetta",
+        "party": "Republicanos",
+        "sourceUrl": "https://www.al.mt.gov.br/midia/texto/almt-da-posse-a-otaviano-pivetta-como-governador-apos-renuncia-de-mauro-mendes/visualizar"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://www.transparencia.mt.gov.br/",
+        "type": "não confirmado"
+      },
+      "capital": {
+        "name": "Cuiabá",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "MS": {
+      "governor": {
+        "name": "Eduardo Riedel",
+        "party": "PP",
+        "sourceUrl": "https://www.oliberal.com/politica/ultimo-governador-do-psdb-eduardo-riedel-do-ms-assina-filiacao-ao-pp-1.1008372"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Maurício Simões Corrêa",
+          "sourceUrl": "https://www.saude.ms.gov.br/medico-mauricio-simoes-assume-o-comando-da-secretaria-de-estado-de-saude-de-ms/"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Hélio Queiroz Daher",
+          "sourceUrl": "https://www.sed.ms.gov.br/helio-queiroz-daher-assume-secretaria-de-estado-de-educacao-em-2023/"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": "Guilherme Alcântara",
+          "sourceUrl": "https://www.seilog.ms.gov.br/a-secretaria/"
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "Antônio Carlos Videira",
+          "sourceUrl": "https://correiodoestado.com.br/cidades/delegado-antonio-carlos-videira-brassume-secretaria-de-seguranca-em-ms/317818/"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": "Flávio César Mendes de Oliveira",
+          "sourceUrl": "https://assets.imprensaoficial.ms.gov.br/public/prd/Diario%20Oficial/2026/08/20/DO12254_20_08_2026.pdf"
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://www.transparencia.ms.gov.br/",
+        "type": "dados abertos/API (dados.ms.gov.br)"
+      },
+      "capital": {
+        "name": "Campo Grande",
+        "portal": {
+          "url": "https://transparencia.campogrande.ms.gov.br/",
+          "type": "dados abertos"
+        }
+      }
+    },
+    "MG": {
+      "governor": {
+        "name": "Mateus Simões",
+        "party": "PSD",
+        "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/de-olho-no-planalto-zema-renuncia-em-mg-mateus-simoes-assume-o-governo/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Fábio Baccheretti Vitor",
+          "sourceUrl": "https://www.saude.mg.gov.br/quem-e-quem/"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Gustavo Braga",
+          "sourceUrl": "https://www.agenciaminas.mg.gov.br/noticia/governador-empossa-gustavo-braga-como-novo-secretario-de-estado-de-educacao"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "Rogério Greco",
+          "sourceUrl": "https://www.seguranca.mg.gov.br/index.php/a-secretaria/institucional/secretario"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": "Luciana Mundim",
+          "sourceUrl": "https://www.em.com.br/politica/2026/04/7401933-governador-demite-secretario-da-fazenda.html"
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://www.transparencia.mg.gov.br/",
+        "type": "dados abertos/API (CKAN, REST — dados.mg.gov.br)"
+      },
+      "capital": {
+        "name": "Belo Horizonte",
+        "portal": {
+          "url": "https://prefeitura.pbh.gov.br/transparencia",
+          "type": "dados abertos (CKAN, CSV)"
+        }
+      }
+    },
+    "PA": {
+      "governor": {
+        "name": "Hana Ghassan",
+        "party": "MDB",
+        "sourceUrl": "https://diariodopara.com.br/para/helder-barbalho-deixa-governo-do-para-e-vice-hana-ghassan-assume-comando/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Ualame Machado",
+          "sourceUrl": "https://www.saude.pa.gov.br/secretario-de-saude-do-para-toma-posse-na-diretoria-do-conass/"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Ricardo Nasser Sefer",
+          "sourceUrl": "https://www.seduc.pa.gov.br/pagina/4748-perfil-do-secretario"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": "Adler Gerciley Almeida da Silveira",
+          "sourceUrl": "https://seinfra.pa.gov.br/"
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "Ed-Lin Anselmo de Lima",
+          "sourceUrl": "https://www.segup.pa.gov.br/secret%C3%A1rio"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": "René de Oliveira e Sousa Júnior",
+          "sourceUrl": "https://www.seplad.pa.gov.br/2026/04/06/para-nomeia-mais-de-17-mil-novos-servidores-concursados-entre-2019-e-2026/"
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://www.sistemas.pa.gov.br/portaltransparencia/dados-abertos",
+        "type": "dados abertos"
+      },
+      "capital": {
+        "name": "Belém",
+        "portal": {
+          "url": "https://portaltransparencia.belem.pa.gov.br/",
+          "type": "dados abertos (download disponível)"
+        }
+      }
+    },
+    "PB": {
+      "governor": {
+        "name": "Lucas Ribeiro",
+        "party": null,
+        "sourceUrl": "https://auniao.pb.gov.br/noticias/caderno_politicas/lucas-ribeiro-assume-governo-da-pb"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "João Pessoa",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "PR": {
+      "governor": {
+        "name": "Carlos Massa Ratinho Junior",
+        "party": "PSD",
+        "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/parana-2026/ratinho-junior-descarta-pressa-por-disputar-presidencia-culpa-polarizacao/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Curitiba",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "PE": {
+      "governor": {
+        "name": "Raquel Lyra",
+        "party": "PSD",
+        "sourceUrl": "https://ndmais.com.br/politica/raquel-lyra/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://web.transparencia.pe.gov.br/dados-abertos/",
+        "type": "dados abertos"
+      },
+      "capital": {
+        "name": "Recife",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "PI": {
+      "governor": {
+        "name": "Rafael Fonteles",
+        "party": "PT",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Rafael_Fonteles"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Dirceu Campêlo",
+          "sourceUrl": "https://piauihoje.com/noticias/politica/quem-e-dirceu-campelo-medico-anunciado-como-novo-secretario-de-saude-do-piaui-445639.html"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Rodrigo Torres",
+          "sourceUrl": "https://www.pi.gov.br/rodrigo-torres-assume-a-secretaria-da-educacao-com-foco-na-continuidade-dos-resultados-e-no-avanco-do-ideb/"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": "Danísio Guimarães e Marabuco",
+          "sourceUrl": "https://www.diario.pi.gov.br/doe/files/diarios/anexo/afbdf2a1-2989-4a51-be3a-5ca9141ea8ca/DOEPI_155_2026.pdf"
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "Antônio Luiz Soares Santos",
+          "sourceUrl": "https://www.ssp.pi.gov.br/governador-rafael-fonteles-empossa-antonio-luiz-como-novo-secretario-de-seguranca-publica/"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": "Emílio Joaquim de Oliveira Júnior",
+          "sourceUrl": "https://portal.sefaz.pi.gov.br/noticias/emilio-junior-e-nomeado-secretario-estadual-da-fazenda"
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://transparencia.pi.gov.br/",
+        "type": "dados abertos (pidigital.pi.gov.br, transparencia2.pi.gov.br)"
+      },
+      "capital": {
+        "name": "Teresina",
+        "portal": {
+          "url": "http://transparencia.teresina.pi.gov.br/",
+          "type": "majoritariamente interface HTML"
+        }
+      }
+    },
+    "RJ": {
+      "governor": {
+        "name": "Ricardo Couto de Castro",
+        "party": null,
+        "sourceUrl": "https://www.cnnbrasil.com.br/politica/castro-renuncia-a-vespera-de-julgamento-no-tse-que-pode-torna-lo-inelegivel/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Rio de Janeiro",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "RN": {
+      "governor": {
+        "name": "Fátima Bezerra",
+        "party": "PT",
+        "sourceUrl": "https://www.cartacapital.com.br/politica/fatima-bezerra-desiste-de-disputar-o-senado-e-permanece-no-governo-do-rn/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Natal",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "RS": {
+      "governor": {
+        "name": "Eduardo Leite",
+        "party": "PSD",
+        "sourceUrl": "https://www.portaladesso.com.br/noticias/19424/eduardo-leite-diz-que-so-renuncia-governo-para-disputar-a-presidencia.html"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Porto Alegre",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "RO": {
+      "governor": {
+        "name": "Marcos Rocha",
+        "party": "PSD",
+        "sourceUrl": "https://transparencia.ro.gov.br/pessoal/governadores"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://transparencia.ro.gov.br/",
+        "type": "seções estruturadas; exportação não confirmada"
+      },
+      "capital": {
+        "name": "Porto Velho",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "RR": {
+      "governor": {
+        "name": "Francisco dos Santos Sampaio (\"Soldado Sampaio\")",
+        "party": "Republicanos",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Soldado_Sampaio"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Ana Célia de Oliveira Paz",
+          "sourceUrl": "https://portal.rr.gov.br/governador-soldado-sampaio-nomeia-novos-secretarios-estaduais/"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": "Gregório Almeida Júnior",
+          "sourceUrl": "https://portal.rr.gov.br/governador-soldado-sampaio-nomeia-novos-secretarios-estaduais/"
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://transparencia.rr.gov.br/",
+        "type": "seção de dados abertos (FIPLAN-RR); API não confirmada"
+      },
+      "capital": {
+        "name": "Boa Vista",
+        "portal": {
+          "url": "https://transparencia.boavista.rr.gov.br/",
+          "type": "não confirmado se há exportação"
+        }
+      }
+    },
+    "SC": {
+      "governor": {
+        "name": "Jorginho Mello",
+        "party": null,
+        "sourceUrl": "https://en.wikipedia.org/wiki/Jorginho_Mello"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": "Diogo Demarchi",
+          "sourceUrl": "https://estado.sc.gov.br/noticias/diogo-demarchi-assume-como-secretario-de-estado-da-saude/"
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": "Luciane Bisognin Ceretta",
+          "sourceUrl": "https://www.sed.sc.gov.br/governador-da-posse-a-luciane-ceretta-como-secretaria-da-educacao-de-santa-catarina/"
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": "Flávio Rogério Pereira Graff",
+          "sourceUrl": "https://ssp.sc.gov.br/o-secretario/"
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": "Cleverson Siewert",
+          "sourceUrl": "https://www.sef.sc.gov.br/noticias/novo-secretario-da-fazenda-toma-posse-na-proxima-terca-feira-20"
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": "https://www.transparencia.sc.gov.br/",
+        "type": "dados abertos com API (dados.sc.gov.br, CKAN)"
+      },
+      "capital": {
+        "name": "Florianópolis",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "SP": {
+      "governor": {
+        "name": "Tarcísio Gomes de Freitas",
+        "party": "Republicanos",
+        "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/quem-sao-os-candidatos-a-governador-de-sao-paulo-em-2026/"
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "São Paulo",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "SE": {
+      "governor": {
+        "name": null,
+        "party": null,
+        "sourceUrl": null
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Aracaju",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    },
+    "TO": {
+      "governor": {
+        "name": null,
+        "party": null,
+        "sourceUrl": null
+      },
+      "secretarias": [
+        {
+          "area": "Saúde",
+          "label": "Secretaria de Saúde",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Educação",
+          "label": "Secretaria de Educação",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Infraestrutura",
+          "label": "Secretaria de Infraestrutura/Obras",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Segurança",
+          "label": "Secretaria de Segurança Pública",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Administração",
+          "label": "Secretaria de Administração/Fazenda",
+          "name": null,
+          "sourceUrl": null
+        },
+        {
+          "area": "Transporte",
+          "label": "Secretaria de Transportes",
+          "name": null,
+          "sourceUrl": null
+        }
+      ],
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Palmas",
+        "portal": {
+          "url": null,
+          "type": null
+        }
+      }
+    }
+  }
+}

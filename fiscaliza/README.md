@@ -107,14 +107,36 @@ já que esses ambientes normalmente não têm por que rodar o ingest sozinhos.
 > simulam o formato de resposta dessas APIs — rode `npm run ingest` de verdade e, se
 > algo vier diferente do esperado, cole a saída do terminal para ajuste.
 
+## Governo, secretariado e portais estaduais (`src/lib/data/real/governance.json`)
+
+Diferente do IBGE/PNCP, **não existe uma API única** para os portais de transparência
+dos 27 estados e suas capitais — cada um roda numa plataforma diferente, a maioria sem
+API pública. Por isso, governador, secretariado e links dos portais de cada estado são
+pesquisados manualmente (via busca na internet), com a URL da fonte oficial citada por
+item, e vivem em `src/lib/data/real/governance.json` — **não são atualizados por
+`npm run ingest`**. Veja `getStateGovernance`/`getStateSecretarias` em
+`src/lib/data/index.ts`, a seção "Governo do estado" em `/estados/[uf]` e o diretório
+completo em `/portais`.
+
+O Fiscaliza Score de cada secretaria, ao contrário, **é dado real**: calculado a partir
+dos contratos do estado (PNCP + simulados) classificados naquela área de gasto — o nome
+do(a) secretário(a) pesquisado é só identificação e nunca entra no cálculo.
+
+Onde a pesquisa não encontrou um nome com fonte confiável e sem conflito entre fontes
+(comum em 2026, ano eleitoral, com várias renúncias de governadores para concorrer a
+outros cargos e alta troca de secretariado), o campo fica em branco de propósito — ver
+`REAL_GOVERNANCE.disclaimer`. Complete/atualize esse arquivo conforme mais pesquisa for
+feita; ele não é gerado automaticamente.
+
 ## Estrutura
 
 ```
 src/
   app/                 rotas (App Router): home, dashboard, mapa, municípios,
-                        estados/[uf], uniao, empresas, contratos, obras, IA,
-                        alertas, metodologia, fontes, sobre, como-funciona,
-                        dados, busca, api/*
+                        estados/[uf] (com governo/secretariado), uniao, portais
+                        (diretório de transparência estadual/capital), empresas,
+                        contratos, obras, IA, alertas, metodologia, fontes, sobre,
+                        como-funciona, dados, busca, api/*
   components/          UI compartilhada (cards, tabelas, gráficos, timeline,
                         grafo de relações, mapa em grade do Brasil, chat da IA,
                         widget do Impostômetro)

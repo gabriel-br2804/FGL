@@ -12,6 +12,7 @@ import contracts from "./real/contracts.json";
 import federal from "./real/federal.json";
 import manifest from "./real/manifest.json";
 import companiesReal from "./real/companies.json";
+import governance from "./real/governance.json";
 import type { SpendingArea } from "../types";
 
 export interface RealMunicipio {
@@ -73,6 +74,28 @@ export const REAL_MANIFEST = manifest as {
   municipiosBatchCount?: number;
   municipiosCoveredTotal?: number;
   municipiosTotal?: number;
+};
+
+export interface RealPortalLink {
+  url: string | null;
+  /** "API" | "dados abertos" | "CSV" | "só HTML" | "não encontrado" — texto livre vindo da pesquisa, exibido como está. */
+  type: string | null;
+}
+
+export interface RealStateGovernance {
+  governor: { name: string | null; party: string | null; sourceUrl: string | null };
+  secretarias: { area: SpendingArea; label: string; name: string | null; sourceUrl: string | null }[];
+  statePortal: RealPortalLink;
+  capital: { name: string | null; portal: RealPortalLink };
+}
+
+/** Governador, secretariado e portais de transparência por estado — pesquisado
+ * manualmente com fonte citada por item (não é um ingest automático como
+ * IBGE/PNCP). Ver `disclaimer` e `/fontes` no app. */
+export const REAL_GOVERNANCE = governance as {
+  asOf: string | null;
+  disclaimer: string;
+  states: Record<string, RealStateGovernance>;
 };
 
 export interface RealCompanyRecord {

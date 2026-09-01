@@ -9,6 +9,7 @@ import { ConcentrationBars } from "@/components/ConcentrationBars";
 import { ScoreFactorList } from "@/components/ScoreFactorList";
 import { DataTable } from "@/components/DataTable";
 import { MonitorButton } from "@/components/MonitorButton";
+import { GovernanceSection, OfficialPortalsCard } from "@/components/GovernanceSection";
 import { fmtBRLCompact, fmtNumber } from "@/lib/engine/format";
 
 export function generateStaticParams() {
@@ -60,7 +61,16 @@ export default function StatePage({ params }: { params: { uf: string } }) {
         </div>
       )}
 
-      <div className="mt-12 grid gap-8 lg:grid-cols-5">
+      <div className="mt-10 grid gap-8 lg:grid-cols-5">
+        <div className="lg:col-span-3">
+          <GovernanceSection governance={detail.governance} secretarias={detail.secretarias} stateName={detail.state.name} />
+        </div>
+        <div className="lg:col-span-2">
+          <OfficialPortalsCard governance={detail.governance} />
+        </div>
+      </div>
+
+      <div className="mt-8 grid gap-8 lg:grid-cols-5">
         <div className="space-y-8 lg:col-span-3">
           <div className="card p-6">
             <h2 className="text-lg font-bold text-navy-900">Onde o estado está investindo</h2>
