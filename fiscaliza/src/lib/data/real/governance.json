@@ -1,0 +1,627 @@
+{
+  "asOf": "2026-09-01",
+  "disclaimer": "Dados de governador (com partido), prefeito da capital e portais pesquisados manualmente via busca na internet, com fonte oficial (URL) citada por item — não vêm de um ingest automático como IBGE/PNCP/SICONFI. 2026 é ano eleitoral: vários governadores renunciaram entre março e maio de 2026 para concorrer a outros cargos, gerando sucessões recentes. Onde a pesquisa não encontrou confirmação segura de um nome atual (ou havia conflito entre fontes), o campo foi deixado em branco propositalmente em vez de arriscar um palpite. Confira sempre a fonte citada antes de tratar um nome como definitivo.",
+  "states": {
+    "AC": {
+      "governor": {
+        "name": "Mailza Assis",
+        "party": "PP",
+        "sourceUrl": "https://acrenews.com.br/decisao-serena-escreve-o-governador-gladson-cameli-em-carta-renuncia-lida-agora-ha-pouco-na-assembleia-legislativa/"
+      },
+      "statePortal": {
+        "url": "https://transparencia.ac.gov.br/",
+        "type": "Exportação PDF/CSV/XLS + portal de dados abertos (dados.ac.gov.br)"
+      },
+      "capital": {
+        "name": "Rio Branco",
+        "portal": {
+          "url": "https://portalcgm.riobranco.ac.gov.br/portal/",
+          "type": "não confirmado se há exportação CSV/API própria"
+        },
+        "mayor": {
+          "name": "Alysson Bestene",
+          "party": "PP",
+          "sourceUrl": "https://acrenews.com.br/bocalom-renuncia-a-prefeitura-de-rio-branco-e-abre-novo-cenario-politico-no-acre/"
+        }
+      }
+    },
+    "AL": {
+      "governor": {
+        "name": "Paulo Dantas",
+        "party": "MDB",
+        "sourceUrl": "https://alagoas.al.gov.br/governo/governador-de-alagoas"
+      },
+      "statePortal": {
+        "url": "https://transparencia.al.gov.br/",
+        "type": "API pública (JSON) + dados abertos (dados.al.gov.br)"
+      },
+      "capital": {
+        "name": "Maceió",
+        "portal": {
+          "url": "https://www.transparencia.maceio.al.gov.br/transparencia/",
+          "type": "dados abertos (CKAN, CSV/XLSX/JSON)"
+        },
+        "mayor": {
+          "name": "João Henrique Caldas (\"JHC\")",
+          "party": "PL",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/eleitorado-de-maceio-al-reelege-jhc-para-a-prefeitura-da-cidade"
+        }
+      }
+    },
+    "AP": {
+      "governor": {
+        "name": "Clécio Luís",
+        "party": "União Brasil",
+        "sourceUrl": "https://uniaobrasil.org.br/alcolumbre-filia-governador-do-amapa-clecio-luis-ao-uniao-brasil/"
+      },
+      "statePortal": {
+        "url": "https://www.transparencia.ap.gov.br/",
+        "type": "seção de dados abertos; API não confirmada"
+      },
+      "capital": {
+        "name": "Macapá",
+        "portal": {
+          "url": "https://macapa.ap.gov.br/portal-transparencia/",
+          "type": "majoritariamente informativo/HTML"
+        },
+        "mayor": {
+          "name": "Pedro dos Santos Martins (\"Pedro DaLua\")",
+          "party": "União Brasil",
+          "sourceUrl": "https://www.macapa.ap.leg.br/institucional/noticias/camara-municipal-de-macapa-oficializa-vacancia-do-cargo-de-prefeito-apos-renuncia-de-dr-furlan"
+        }
+      }
+    },
+    "AM": {
+      "governor": {
+        "name": "Roberto Cidade",
+        "party": null,
+        "sourceUrl": "https://www.cnnbrasil.com.br/politica/apos-anunciar-que-ficaria-wilson-lima-renuncia-ao-governo-do-amazonas/"
+      },
+      "statePortal": {
+        "url": "https://www.transparencia.am.gov.br/",
+        "type": "API de Dados Abertos"
+      },
+      "capital": {
+        "name": "Manaus",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "David Almeida",
+          "party": "Avante",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/david-almeida-e-eleito-prefeito-de-manaus-am"
+        }
+      }
+    },
+    "BA": {
+      "governor": {
+        "name": "Jerônimo Rodrigues",
+        "party": "PT",
+        "sourceUrl": "https://pt.wikipedia.org/wiki/Gest%C3%A3o_Jer%C3%B4nimo_Rodrigues_no_governo_da_Bahia"
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Salvador",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Bruno Reis",
+          "party": "União Brasil",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/bruno-reis-uniao-e-reeleito-prefeito-de-salvador-ba"
+        }
+      }
+    },
+    "CE": {
+      "governor": {
+        "name": "Elmano de Freitas",
+        "party": "PT",
+        "sourceUrl": "https://www.ceara.gov.br/2024/12/26/governador-elmano-de-freitas-anuncia-novos-titulares-de-secretarias-e-orgaos-vinculados/"
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Fortaleza",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Evandro Sá Barreto Leitão",
+          "party": "PT",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/evandro-leitao-venceu-a-disputa-pela-prefeitura-de-fortaleza-ce"
+        }
+      }
+    },
+    "DF": {
+      "governor": {
+        "name": "Celina Leão",
+        "party": "PP",
+        "sourceUrl": "https://www.cl.df.gov.br/-/celina-leao-toma-posse-como-governadora-do-distrito-federal"
+      },
+      "statePortal": {
+        "url": "https://www.dados.df.gov.br/",
+        "type": "dados abertos (catálogo CKAN, CSV)"
+      },
+      "capital": {
+        "name": "Brasília",
+        "portal": {
+          "url": null,
+          "type": "mesmo portal do governo do DF (unidade federativa única)"
+        },
+        "mayor": {
+          "name": null,
+          "party": null,
+          "sourceUrl": null
+        }
+      }
+    },
+    "ES": {
+      "governor": {
+        "name": "Ricardo Ferraço",
+        "party": "MDB",
+        "sourceUrl": "https://seg.es.gov.br/Not%C3%ADcia/ricardo-ferraco-toma-posse-como-governador-do-espirito-santo"
+      },
+      "statePortal": {
+        "url": "https://transparencia.es.gov.br/",
+        "type": "dados abertos (dados.es.gov.br) com API"
+      },
+      "capital": {
+        "name": "Vitória",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Lorenzo Pazolini",
+          "party": "Republicanos",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/lorenzo-pazolini-e-prefeito-reeleito-de-vitoria-es"
+        }
+      }
+    },
+    "GO": {
+      "governor": {
+        "name": "Daniel Vilela",
+        "party": "MDB",
+        "sourceUrl": "https://goias.gov.br/abc/daniel-vilela-toma-posse-como-governador-de-goias/"
+      },
+      "statePortal": {
+        "url": "https://transparencia.go.gov.br/",
+        "type": "dados abertos com API (CKAN) e CSV"
+      },
+      "capital": {
+        "name": "Goiânia",
+        "portal": {
+          "url": "https://dadosabertos.goiania.go.gov.br/",
+          "type": "dados abertos com API e CSV"
+        },
+        "mayor": {
+          "name": "Sandro Mabel",
+          "party": "União Brasil",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/no-2o-turno-goiania-go-elege-mabel-para-prefeito"
+        }
+      }
+    },
+    "MA": {
+      "governor": {
+        "name": "Carlos Brandão",
+        "party": null,
+        "sourceUrl": "https://pt.wikipedia.org/wiki/Carlos_Brand%C3%A3o_(pol%C3%ADtico)"
+      },
+      "statePortal": {
+        "url": "http://www.transparencia.ma.gov.br/",
+        "type": "API pública (REST/JSON) e dados abertos (dados.ma.gov.br)"
+      },
+      "capital": {
+        "name": "São Luís",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Esmênia Miranda",
+          "party": "PSD",
+          "sourceUrl": "https://www.cmsaoluis.ma.gov.br/noticia/870/Prefeita-Esmenia-Miranda-toma-posse-na-Camara-de-Sao-Luis"
+        }
+      }
+    },
+    "MT": {
+      "governor": {
+        "name": "Otaviano Pivetta",
+        "party": "Republicanos",
+        "sourceUrl": "https://www.al.mt.gov.br/midia/texto/almt-da-posse-a-otaviano-pivetta-como-governador-apos-renuncia-de-mauro-mendes/visualizar"
+      },
+      "statePortal": {
+        "url": "https://www.transparencia.mt.gov.br/",
+        "type": "não confirmado"
+      },
+      "capital": {
+        "name": "Cuiabá",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Abilio Brunini",
+          "party": "PL",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/abilio-e-eleito-prefeito-de-cuiaba-mt"
+        }
+      }
+    },
+    "MS": {
+      "governor": {
+        "name": "Eduardo Riedel",
+        "party": "PP",
+        "sourceUrl": "https://www.oliberal.com/politica/ultimo-governador-do-psdb-eduardo-riedel-do-ms-assina-filiacao-ao-pp-1.1008372"
+      },
+      "statePortal": {
+        "url": "https://www.transparencia.ms.gov.br/",
+        "type": "dados abertos/API (dados.ms.gov.br)"
+      },
+      "capital": {
+        "name": "Campo Grande",
+        "portal": {
+          "url": "https://transparencia.campogrande.ms.gov.br/",
+          "type": "dados abertos"
+        },
+        "mayor": {
+          "name": "Adriane Lopes",
+          "party": "PP",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/adriane-lopes-e-a-nova-prefeita-de-campo-grande-ms"
+        }
+      }
+    },
+    "MG": {
+      "governor": {
+        "name": "Mateus Simões",
+        "party": "PSD",
+        "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/de-olho-no-planalto-zema-renuncia-em-mg-mateus-simoes-assume-o-governo/"
+      },
+      "statePortal": {
+        "url": "https://www.transparencia.mg.gov.br/",
+        "type": "dados abertos/API (CKAN, REST — dados.mg.gov.br)"
+      },
+      "capital": {
+        "name": "Belo Horizonte",
+        "portal": {
+          "url": "https://prefeitura.pbh.gov.br/transparencia",
+          "type": "dados abertos (CKAN, CSV)"
+        },
+        "mayor": {
+          "name": "Álvaro Damião",
+          "party": "União Brasil",
+          "sourceUrl": "https://prefeitura.pbh.gov.br/alvaro-damiao"
+        }
+      }
+    },
+    "PA": {
+      "governor": {
+        "name": "Hana Ghassan",
+        "party": "MDB",
+        "sourceUrl": "https://diariodopara.com.br/para/helder-barbalho-deixa-governo-do-para-e-vice-hana-ghassan-assume-comando/"
+      },
+      "statePortal": {
+        "url": "https://www.sistemas.pa.gov.br/portaltransparencia/dados-abertos",
+        "type": "dados abertos"
+      },
+      "capital": {
+        "name": "Belém",
+        "portal": {
+          "url": "https://portaltransparencia.belem.pa.gov.br/",
+          "type": "dados abertos (download disponível)"
+        },
+        "mayor": {
+          "name": "Igor Normando",
+          "party": "MDB",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/igor-normando-e-eleito-prefeito-de-belem-pa"
+        }
+      }
+    },
+    "PB": {
+      "governor": {
+        "name": "Lucas Ribeiro",
+        "party": null,
+        "sourceUrl": "https://auniao.pb.gov.br/noticias/caderno_politicas/lucas-ribeiro-assume-governo-da-pb"
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "João Pessoa",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Leo Bezerra",
+          "party": "PSDB",
+          "sourceUrl": "https://mauriliojunior.com/2026/08/07/aecio-neves-se-antecipa-a-leo-e-anuncia-filiacao-do-prefeito-de-joao-pessoa-ao-psdb/"
+        }
+      }
+    },
+    "PR": {
+      "governor": {
+        "name": "Carlos Massa Ratinho Junior",
+        "party": "PSD",
+        "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/parana-2026/ratinho-junior-descarta-pressa-por-disputar-presidencia-culpa-polarizacao/"
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Curitiba",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Eduardo Pimentel",
+          "party": "PSD",
+          "sourceUrl": "https://www.curitiba.pr.gov.br/noticias/eduardo-pimentel-e-paulo-martins-tomam-posse-como-prefeito-de-curitiba-e-vice-para-a-gestao-2025-2028/75537"
+        }
+      }
+    },
+    "PE": {
+      "governor": {
+        "name": "Raquel Lyra",
+        "party": "PSD",
+        "sourceUrl": "https://ndmais.com.br/politica/raquel-lyra/"
+      },
+      "statePortal": {
+        "url": "https://web.transparencia.pe.gov.br/dados-abertos/",
+        "type": "dados abertos"
+      },
+      "capital": {
+        "name": "Recife",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Victor Marques",
+          "party": "PCdoB",
+          "sourceUrl": "https://www.recife.pe.leg.br/comunicacao/noticias/2026/04/victor-marques-toma-posse-como-prefeito-do-recife-na-camara-municipal"
+        }
+      }
+    },
+    "PI": {
+      "governor": {
+        "name": "Rafael Fonteles",
+        "party": "PT",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Rafael_Fonteles"
+      },
+      "statePortal": {
+        "url": "https://transparencia.pi.gov.br/",
+        "type": "dados abertos (pidigital.pi.gov.br, transparencia2.pi.gov.br)"
+      },
+      "capital": {
+        "name": "Teresina",
+        "portal": {
+          "url": "http://transparencia.teresina.pi.gov.br/",
+          "type": "majoritariamente interface HTML"
+        },
+        "mayor": {
+          "name": "Silvio Mendes",
+          "party": "União Brasil",
+          "sourceUrl": "https://agenciabrasil.ebc.com.br/politica/noticia/2024-10/silvio-mendes-e-eleito-em-teresina"
+        }
+      }
+    },
+    "RJ": {
+      "governor": {
+        "name": "Ricardo Couto de Castro",
+        "party": null,
+        "sourceUrl": "https://www.cnnbrasil.com.br/politica/castro-renuncia-a-vespera-de-julgamento-no-tse-que-pode-torna-lo-inelegivel/"
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Rio de Janeiro",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Eduardo Cavaliere",
+          "party": "PSD",
+          "sourceUrl": "https://psd.org.br/noticias/eduardo-cavaliere-e-o-novo-prefeito-do-rio-de-janeiro/"
+        }
+      }
+    },
+    "RN": {
+      "governor": {
+        "name": "Fátima Bezerra",
+        "party": "PT",
+        "sourceUrl": "https://www.cartacapital.com.br/politica/fatima-bezerra-desiste-de-disputar-o-senado-e-permanece-no-governo-do-rn/"
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Natal",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Paulo Eduardo da Costa Freire (\"Paulinho Freire\")",
+          "party": "União Brasil",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/paulinho-freire-vence-disputa-pela-prefeitura-de-natal-rn"
+        }
+      }
+    },
+    "RS": {
+      "governor": {
+        "name": "Eduardo Leite",
+        "party": "PSD",
+        "sourceUrl": "https://www.portaladesso.com.br/noticias/19424/eduardo-leite-diz-que-so-renuncia-governo-para-disputar-a-presidencia.html"
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Porto Alegre",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Sebastião de Araújo Melo",
+          "party": "MDB",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/sebastiao-melo-mdb-e-reeleito-prefeito-de-porto-alegre-rs"
+        }
+      }
+    },
+    "RO": {
+      "governor": {
+        "name": "Marcos Rocha",
+        "party": "PSD",
+        "sourceUrl": "https://transparencia.ro.gov.br/pessoal/governadores"
+      },
+      "statePortal": {
+        "url": "https://transparencia.ro.gov.br/",
+        "type": "seções estruturadas; exportação não confirmada"
+      },
+      "capital": {
+        "name": "Porto Velho",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Leonardo Barreto de Moraes (\"Léo Moraes\")",
+          "party": "Podemos",
+          "sourceUrl": "https://www.portovelho.ro.gov.br/artigo/46450/solenidade-prefeito-vice-prefeita-e-vereadores-eleitos-sao-diplomados-para-o-exercicio-municipal-de-2025"
+        }
+      }
+    },
+    "RR": {
+      "governor": {
+        "name": "Francisco dos Santos Sampaio (\"Soldado Sampaio\")",
+        "party": "Republicanos",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Soldado_Sampaio"
+      },
+      "statePortal": {
+        "url": "https://transparencia.rr.gov.br/",
+        "type": "seção de dados abertos (FIPLAN-RR); API não confirmada"
+      },
+      "capital": {
+        "name": "Boa Vista",
+        "portal": {
+          "url": "https://transparencia.boavista.rr.gov.br/",
+          "type": "não confirmado se há exportação"
+        },
+        "mayor": {
+          "name": "Arthur Henrique",
+          "party": "MDB",
+          "sourceUrl": "https://www.tre-rr.jus.br/comunicacao/noticias/2024/Dezembro/1a-zona-eleitoral-diplomou-os-candidatos-eleitos-a-vereadores-e-a-prefeitura-de-boa-vista-nas-eleicoes-de-2024"
+        }
+      }
+    },
+    "SC": {
+      "governor": {
+        "name": "Jorginho Mello",
+        "party": null,
+        "sourceUrl": "https://en.wikipedia.org/wiki/Jorginho_Mello"
+      },
+      "statePortal": {
+        "url": "https://www.transparencia.sc.gov.br/",
+        "type": "dados abertos com API (dados.sc.gov.br, CKAN)"
+      },
+      "capital": {
+        "name": "Florianópolis",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Topázio Neto",
+          "party": "PSD",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/topazio-e-reeleito-prefeito-de-florianopolis-sc-no-1o-turno-das-eleicoes-2024"
+        }
+      }
+    },
+    "SP": {
+      "governor": {
+        "name": "Tarcísio Gomes de Freitas",
+        "party": "Republicanos",
+        "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/quem-sao-os-candidatos-a-governador-de-sao-paulo-em-2026/"
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "São Paulo",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Ricardo Nunes",
+          "party": "MDB",
+          "sourceUrl": "https://www.saopaulo.sp.leg.br/blog/ricardo-nunes-e-reeleito-prefeito-da-capital-paulista-com-5935-dos-votos/"
+        }
+      }
+    },
+    "SE": {
+      "governor": {
+        "name": null,
+        "party": null,
+        "sourceUrl": null
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Aracaju",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Emília Corrêa",
+          "party": "PL",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/nova-prefeita-de-aracaju-se-sera-emilia-correa"
+        }
+      }
+    },
+    "TO": {
+      "governor": {
+        "name": null,
+        "party": null,
+        "sourceUrl": null
+      },
+      "statePortal": {
+        "url": null,
+        "type": null
+      },
+      "capital": {
+        "name": "Palmas",
+        "portal": {
+          "url": null,
+          "type": null
+        },
+        "mayor": {
+          "name": "Eduardo Siqueira Campos",
+          "party": "Podemos",
+          "sourceUrl": "https://www.tse.jus.br/comunicacao/noticias/2024/Outubro/eduardo-siqueira-campos-e-o-novo-prefeito-de-palmas-to"
+        }
+      }
+    }
+  }
+}

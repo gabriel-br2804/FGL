@@ -1,0 +1,333 @@
+// Fiscaliza — modelo de dados de produção (PostgreSQL).
+//
+// Este schema descreve a arquitetura de dados alvo do Fiscaliza para
+// operação em produção. NÃO está conectado a um banco no MVP atual:
+// o app roda hoje sobre fixtures simuladas em `src/lib/data`, expostas
+// através das mesmas formas de dados (`src/lib/types.ts`) que este
+// schema modela, para que a migração para Postgres real seja apenas
+// uma troca da camada de repositório, sem tocar em telas.
+//
+// Para ativar em produção:
+//   1. `npm i @prisma/client prisma`
+//   2. definir DATABASE_URL (Postgres) e REDIS_URL (cache/filas)
+//   3. `npx prisma migrate dev`
+//   4. implementar `src/lib/data/repository.ts` usando o Prisma Client
+//      no lugar das fixtures.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Sphere {
+  FEDERAL
+  ESTADUAL
+  MUNICIPAL
+}
+
+enum BidModality {
+  PREGAO_ELETRONICO
+  CONCORRENCIA
+  TOMADA_DE_PRECOS
+  DISPENSA
+  INEXIGIBILIDADE
+  CONVITE
+}
+
+enum ContractStatus {
+  VIGENTE
+  ENCERRADO
+  RESCINDIDO
+}
+
+enum ProjectStatus {
+  PLANEJADA
+  EM_EXECUCAO
+  ATRASADA
+  CONCLUIDA
+  PARALISADA
+}
+
+enum SignalType {
+  PRECO_FORA_PADRAO
+  EMPRESA_RECENTE
+  CONCENTRACAO_FORNECEDORES
+  ADITIVOS_ELEVADOS
+  BAIXA_CONCORRENCIA
+  CONTRATOS_RECORRENTES
+  CRESCIMENTO_ANORMAL
+}
+
+enum SourceType {
+  PORTAL_TRANSPARENCIA_FEDERAL
+  DADOS_GOV_BR
+  COMPRAS_GOV_BR
+  TCE
+  PORTAL_ESTADUAL
+  PORTAL_MUNICIPAL
+  SIMULADO
+}
+
+model DataSource {
+  id         String     @id @default(cuid())
+  name       String
+  connector  String
+  type       SourceType
+  url        String?
+  lastSync   DateTime?
+  simulated  Boolean    @default(false)
+  contracts  Contract[] @relation("ContractSources")
+  payments   Payment[]  @relation("PaymentSources")
+}
+
+model State {
+  id            String         @id // UF
+  name          String
+  region        String
+  population    Int
+  municipalities Municipality[]
+}
+
+model Municipality {
+  id             String         @id @default(cuid())
+  ibgeCode       String         @unique
+  name           String
+  state          State          @relation(fields: [stateId], references: [id])
+  stateId        String
+  population     Int
+  annualBudget   Decimal
+  lat            Float
+  lon            Float
+  agencies       Agency[]
+  contracts      Contract[]
+  projects       Project[]
+  companies      Company[]
+  riskSignals    RiskSignal[]
+  score          FiscalizaScore?
+
+  @@index([stateId])
+}
+
+model GovernmentEntity {
+  id       String   @id @default(cuid())
+  name     String
+  sphere   Sphere
+  agencies Agency[]
+}
+
+model Agency {
+  id             String            @id @default(cuid())
+  name           String
+  entity         GovernmentEntity  @relation(fields: [entityId], references: [id])
+  entityId       String
+  municipality   Municipality?     @relation(fields: [municipalityId], references: [id])
+  municipalityId String?
+  bids           Bid[]
+  contracts      Contract[]
+  projects       Project[]
+
+  @@index([municipalityId])
+}
+
+model Company {
+  id                       String       @id @default(cuid())
+  cnpj                     String       @unique
+  name                     String
+  status                   String
+  openedAt                 DateTime
+  municipality             Municipality @relation(fields: [municipalityId], references: [id])
+  municipalityId           String
+  economicActivity         String
+  contracts                Contract[]
+  bidsWon                  Bid[]
+  partners                 PersonCompany[]
+  sanctions                Sanction[]
+  riskSignals              RiskSignal[]
+  score                    FiscalizaScore?
+
+  @@index([municipalityId])
+}
+
+model Person {
+  id        String          @id @default(cuid())
+  name      String
+  companies PersonCompany[]
+}
+
+model PersonCompany {
+  id        String  @id @default(cuid())
+  person    Person  @relation(fields: [personId], references: [id])
+  personId  String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+  role      String
+
+  @@index([personId])
+  @@index([companyId])
+}
+
+model Bid {
+  id              String      @id @default(cuid())
+  number          String
+  agency          Agency      @relation(fields: [agencyId], references: [id])
+  agencyId        String
+  modality        BidModality
+  estimatedValue  Decimal
+  contractedValue Decimal
+  participants    Int
+  proposals       Int
+  winner          Company     @relation(fields: [winnerCompanyId], references: [id])
+  winnerCompanyId String
+  openedAt        DateTime
+  object          String
+  contracts       Contract[]
+
+  @@index([agencyId])
+}
+
+model Contract {
+  id             String         @id @default(cuid())
+  number         String
+  bid            Bid?           @relation(fields: [bidId], references: [id])
+  bidId          String?
+  agency         Agency         @relation(fields: [agencyId], references: [id])
+  agencyId       String
+  municipality   Municipality   @relation(fields: [municipalityId], references: [id])
+  municipalityId String
+  company        Company        @relation(fields: [companyId], references: [id])
+  companyId      String
+  object         String
+  category       String
+  originalValue  Decimal
+  currentValue   Decimal
+  signedAt       DateTime
+  deadline       DateTime
+  status         ContractStatus
+  amendments     Amendment[]
+  payments       Payment[]
+  projects       Project[]
+  sources        DataSource[]   @relation("ContractSources")
+
+  @@index([agencyId])
+  @@index([municipalityId])
+  @@index([companyId])
+}
+
+model Amendment {
+  id             String   @id @default(cuid())
+  contract       Contract @relation(fields: [contractId], references: [id])
+  contractId     String
+  number         Int
+  date           DateTime
+  previousValue  Decimal
+  newValue       Decimal
+  reason         String
+
+  @@index([contractId])
+}
+
+model Payment {
+  id          String       @id @default(cuid())
+  contract    Contract     @relation(fields: [contractId], references: [id])
+  contractId  String
+  date        DateTime
+  value       Decimal
+  description String
+  sources     DataSource[] @relation("PaymentSources")
+
+  @@index([contractId])
+}
+
+model Expense {
+  id             String   @id @default(cuid())
+  municipalityId String
+  category       String
+  year           Int
+  value          Decimal
+
+  @@index([municipalityId, year])
+}
+
+model Transfer {
+  id             String   @id @default(cuid())
+  fromEntityId   String
+  toMunicipality String
+  program        String
+  value          Decimal
+  date           DateTime
+}
+
+model Project {
+  id               String        @id @default(cuid())
+  name             String
+  municipality     Municipality  @relation(fields: [municipalityId], references: [id])
+  municipalityId   String
+  agency           Agency        @relation(fields: [agencyId], references: [id])
+  agencyId         String
+  contract         Contract      @relation(fields: [contractId], references: [id])
+  contractId       String
+  lat              Float
+  lon              Float
+  originalValue    Decimal
+  currentValue     Decimal
+  startedAt        DateTime
+  deadline         DateTime
+  status           ProjectStatus
+  executedPercent  Float?
+
+  @@index([municipalityId])
+}
+
+model Sanction {
+  id          String   @id @default(cuid())
+  company     Company  @relation(fields: [companyId], references: [id])
+  companyId   String
+  type        String
+  agency      String
+  date        DateTime
+  description String
+
+  @@index([companyId])
+}
+
+model PublicOfficial {
+  id       String @id @default(cuid())
+  name     String
+  role     String
+  agencyId String
+}
+
+model RiskSignal {
+  id             String       @id @default(cuid())
+  type           SignalType
+  targetType     String
+  companyId      String?
+  company        Company?     @relation(fields: [companyId], references: [id])
+  municipalityId String?
+  municipality   Municipality? @relation(fields: [municipalityId], references: [id])
+  points         Int
+  title          String
+  data           String
+  analysis       String
+  interpretation String
+  severity       String
+  createdAt      DateTime     @default(now())
+
+  @@index([companyId])
+  @@index([municipalityId])
+}
+
+model FiscalizaScore {
+  id             String        @id @default(cuid())
+  companyId      String?       @unique
+  company        Company?      @relation(fields: [companyId], references: [id])
+  municipalityId String?       @unique
+  municipality   Municipality? @relation(fields: [municipalityId], references: [id])
+  total          Int
+  factors        Json
+  computedAt     DateTime      @default(now())
+}
