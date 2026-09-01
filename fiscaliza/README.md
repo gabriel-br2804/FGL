@@ -58,18 +58,30 @@ npm run typecheck # checagem de tipos
 ```bash
 npm run ingest                                    # IBGE + PNCP (municípios, estados, União)
 PORTAL_TRANSPARENCIA_API_KEY=xxxx npm run ingest  # inclui União com mais detalhe
-INGEST_LIMIT=10 npm run ingest                    # teste rápido, poucos municípios
+INGEST_LIMIT=10 npm run ingest                    # teste rápido, lote pequeno de municípios
 ```
 
 O script roda em quatro passos (`scripts/ingest/`):
 
-1. **IBGE** (`ibge.mjs`) — geografia e população reais via API de Localidades/Agregados.
-   Sem chave, alta confiança de que funciona de primeira.
+1. **IBGE** (`ibge.mjs`) — geografia e população reais via API de Localidades/Agregados,
+   dos ~5.571 municípios e 27 estados. Sem chave, alta confiança de que funciona de
+   primeira.
 2. **PNCP** (`pncp.mjs`) — contratos e licitações reais de municípios, estados e União,
    via API de Consulta do Portal Nacional de Contratações Públicas (a fonte que, desde
    a Lei 14.133/2021, todo ente público é obrigado a publicar). Sem chave. Implementado
    com parsing defensivo — se o formato de algum endpoint mudar, o script loga o erro e
    segue para a próxima entidade em vez de quebrar a ingestão inteira.
+
+   **Cobertura nacional progressiva:** o PNCP não aguenta ser consultado para os ~5.571
+   municípios numa execução só (rate limiting agressivo — ver `lib/http.mjs`). Por isso
+   cada `npm run ingest` consome um **lote** de municípios ainda não consultados (os
+   maiores por população primeiro, controlado por `INGEST_LIMIT`, padrão 400 por
+   execução) e grava o progresso em `src/lib/data/real/pncp-progress.json`. Estados e
+   União são sempre revisitados por completo em toda execução (são só 28 entidades,
+   barato). **Rode `npm run ingest` várias vezes** (pode ser em dias diferentes) até a
+   barra de cobertura em `/fontes` chegar a 100% — a cada execução, o que já foi
+   coletado antes é preservado, só o lote da vez é atualizado. Depois de cobrir o Brasil
+   inteiro, novas execuções passam a atualizar primeiro quem está com dado mais antigo.
 3. **BrasilAPI** (`cnpj.mjs`) — para cada CNPJ de fornecedor encontrado no passo
    anterior, confirma razão social, data de abertura, situação cadastral, CNAE e sócios
    junto à Receita Federal (via BrasilAPI, espelho gratuito e sem chave). É esse passo

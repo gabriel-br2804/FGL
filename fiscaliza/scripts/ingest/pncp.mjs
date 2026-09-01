@@ -19,7 +19,7 @@
  *
  * Saída: src/lib/data/real/contracts.json
  */
-import { writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchJson, logSection, mapWithConcurrency } from "./lib/http.mjs";
@@ -64,16 +64,26 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-function buildPayload({ allTargets, allRecords, sourceErrors, rawSamplesByScope, supplierLookupTargets, resultadosErrors, resultadosRawSamples }) {
+async function loadExistingContracts() {
+  try {
+    const raw = await readFile(path.join(OUT_DIR, "contracts.json"), "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function buildPayload({ allTargets, records, recordsThisRun, sourceErrors, rawSamplesByScope, supplierLookupTargets, resultadosErrors, resultadosRawSamples }) {
   return {
     generatedAt: new Date().toISOString(),
     source: "PNCP — Portal Nacional de Contratações Públicas (API de Consulta)",
     dateRange: dateRange(),
     modalitiesQueried: MODALITIES.map((m) => m.label),
-    records: allRecords,
+    records,
     stats: {
       entitiesQueried: allTargets.length,
-      recordsFetched: allRecords.length,
+      recordsFetched: records.length,
+      recordsFetchedThisRun: recordsThisRun,
       entitiesWithErrors: sourceErrors.length,
       supplierLookupsAttempted: supplierLookupTargets.length,
       supplierLookupsResolved: supplierLookupTargets.filter((r) => r.supplierCnpj).length,
@@ -259,6 +269,20 @@ export async function ingestPncp(targets) {
   const allTargets = [...municipioTargets, ...stateTargets, federalTarget];
   console.log(`[ingest] consultando PNCP para ${allTargets.length} entidades (${MODALITIES.length} modalidades cada)...`);
 
+  // Cobertura nacional progressiva: o Brasil tem ~5.571 municípios e o PNCP
+  // não aguenta consultar todos numa execução só (ver rate limiting em
+  // http.mjs) — run.mjs manda aqui só o LOTE desta execução (os municípios
+  // ainda não consultados, priorizando os maiores). Para não perder a
+  // cobertura já conquistada em execuções anteriores, preserva os registros
+  // de município que já existiam em contracts.json e não fazem parte do
+  // lote de agora; estado/União são sempre revisitados por completo (só 28
+  // entidades, barato) e por isso seus registros antigos são descartados.
+  const existing = await loadExistingContracts();
+  const queriedMuniIbgeIds = new Set(municipioTargets.map((t) => String(t.id)));
+  const preservedMuniRecords = (existing?.records ?? []).filter(
+    (r) => typeof r.scope === "string" && r.scope.startsWith("município") && !queriedMuniIbgeIds.has(String(r.municipalityIbge))
+  );
+
   const allRecords = [];
   const sourceErrors = [];
   const rawSamplesByScope = {};
@@ -270,7 +294,7 @@ export async function ingestPncp(targets) {
     if (errors.length) sourceErrors.push({ target: target.label, errors });
   });
 
-  console.log(`[ingest] PNCP: ${allRecords.length} registros normalizados de ${allTargets.length} entidades consultadas.`);
+  console.log(`[ingest] PNCP: ${allRecords.length} registros normalizados de ${allTargets.length} entidades consultadas nesta execução (${preservedMuniRecords.length} preservados de execuções anteriores).`);
   if (sourceErrors.length > 0) {
     console.warn(`[ingest] PNCP teve problemas em ${sourceErrors.length} entidade(s) — ver contracts.json > errors para detalhes.`);
   }
@@ -291,7 +315,8 @@ export async function ingestPncp(targets) {
   await writePayload(
     buildPayload({
       allTargets,
-      allRecords,
+      records: [...preservedMuniRecords, ...allRecords],
+      recordsThisRun: allRecords.length,
       sourceErrors,
       rawSamplesByScope,
       supplierLookupTargets,
@@ -330,14 +355,32 @@ export async function ingestPncp(targets) {
       // resolvido até aqui.
       if (processed % 10 === 0) {
         await writePayload(
-          buildPayload({ allTargets, allRecords, sourceErrors, rawSamplesByScope, supplierLookupTargets, resultadosErrors, resultadosRawSamples })
+          buildPayload({
+            allTargets,
+            records: [...preservedMuniRecords, ...allRecords],
+            recordsThisRun: allRecords.length,
+            sourceErrors,
+            rawSamplesByScope,
+            supplierLookupTargets,
+            resultadosErrors,
+            resultadosRawSamples,
+          })
         );
       }
     }
     console.log(`[ingest] fornecedor real encontrado em ${resolved}/${supplierLookupTargets.length} contrato(s) consultados.`);
   }
 
-  const payload = buildPayload({ allTargets, allRecords, sourceErrors, rawSamplesByScope, supplierLookupTargets, resultadosErrors, resultadosRawSamples });
+  const payload = buildPayload({
+    allTargets,
+    records: [...preservedMuniRecords, ...allRecords],
+    recordsThisRun: allRecords.length,
+    sourceErrors,
+    rawSamplesByScope,
+    supplierLookupTargets,
+    resultadosErrors,
+    resultadosRawSamples,
+  });
   await writePayload(payload);
   console.log(`[ingest] escrito em src/lib/data/real/contracts.json`);
   return payload;

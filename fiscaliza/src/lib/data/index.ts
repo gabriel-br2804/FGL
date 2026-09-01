@@ -180,7 +180,13 @@ export function listDataSources(): DataSource[] {
 
 export interface RealDataStatus {
   ibge: { ok: boolean; statesFetched: number; municipalitiesFetched: number };
-  pncp: { ok: boolean; recordsFetched: number; entitiesQueried: number };
+  pncp: {
+    ok: boolean;
+    recordsFetched: number;
+    entitiesQueried: number;
+    municipiosCoveredTotal: number;
+    municipiosTotal: number;
+  };
   cnpj: { ok: boolean; requested: number; resolved: number };
   portalTransparencia: { ok: boolean; contractsFetched: number; skipped: boolean; reason?: string };
   generatedAt: string | null;
@@ -197,6 +203,8 @@ export function getRealDataStatus(): RealDataStatus {
       ok: REAL_MANIFEST.pncp.ok,
       recordsFetched: REAL_MANIFEST.pncp.recordsFetched ?? 0,
       entitiesQueried: REAL_MANIFEST.pncp.entitiesQueried ?? 0,
+      municipiosCoveredTotal: REAL_MANIFEST.municipiosCoveredTotal ?? 0,
+      municipiosTotal: REAL_MANIFEST.municipiosTotal ?? 0,
     },
     cnpj: {
       ok: REAL_MANIFEST.cnpj?.ok ?? false,

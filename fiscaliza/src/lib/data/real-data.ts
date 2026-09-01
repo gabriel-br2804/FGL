@@ -70,7 +70,9 @@ export const REAL_MANIFEST = manifest as {
   pncp: { ok: boolean; recordsFetched?: number; entitiesQueried?: number; skipped?: boolean };
   cnpj?: { ok: boolean; requested?: number; resolved?: number; skipped?: boolean };
   portalTransparencia: { ok: boolean; contractsFetched?: number; skipped?: boolean; reason?: string };
-  principaisMunicipiosCount: number;
+  municipiosBatchCount?: number;
+  municipiosCoveredTotal?: number;
+  municipiosTotal?: number;
 };
 
 export interface RealCompanyRecord {

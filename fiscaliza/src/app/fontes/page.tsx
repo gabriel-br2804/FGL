@@ -7,7 +7,7 @@ export const metadata = { title: "Fontes de dados — Fiscaliza" };
 const ROADMAP = [
   "SICONFI (Tesouro Nacional) para orçamento e execução orçamentária oficiais por função (saúde, educação...), complementando a distribuição por área hoje derivada dos contratos",
   "Tribunais de Contas estaduais (demais UFs, além de SP) — sanções e julgamento de contas",
-  "Cobertura de PNCP para todos os ~5.570 municípios (hoje: os maiores por população)",
+  "Cobertura de PNCP para todos os ~5.570 municípios — já em andamento: cada execução de `npm run ingest` cobre um novo lote (ver progresso acima)",
   "Detalhamento de aditivos e pagamentos por contrato via PNCP (endpoint de atualizações)",
   "Cadastros de sanções (CEIS, CNEP, CEPIM)",
 ];
@@ -58,9 +58,27 @@ export default function FontesPage() {
             <StatusPill ok={real.pncp.ok} label={real.pncp.ok ? "PNCP conectado" : "PNCP não executado"} />
             <p className="mt-2 text-xs text-ink-500">
               {real.pncp.ok
-                ? `${real.pncp.recordsFetched} contrato(s) reais coletados de ${real.pncp.entitiesQueried} entidade(s) (municípios, estados e União).`
+                ? `${real.pncp.recordsFetched} contrato(s) reais coletados de ${real.pncp.entitiesQueried} entidade(s) consultadas na última execução.`
                 : "Contratos, fornecedores e valores ainda são simulados."}
             </p>
+            {real.pncp.municipiosTotal > 0 && (
+              <div className="mt-2">
+                <div className="flex items-center justify-between text-[11px] text-ink-500">
+                  <span>Cobertura nacional de municípios</span>
+                  <span>
+                    {real.pncp.municipiosCoveredTotal}/{real.pncp.municipiosTotal}
+                  </span>
+                </div>
+                <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-ink-900/[0.06]">
+                  <div
+                    className="h-full rounded-full bg-signal-blue"
+                    style={{
+                      width: `${Math.min(100, (real.pncp.municipiosCoveredTotal / real.pncp.municipiosTotal) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <div>
             <StatusPill ok={real.cnpj.ok} label={real.cnpj.ok ? "BrasilAPI conectado" : "BrasilAPI não executado"} />
@@ -150,8 +168,9 @@ export default function FontesPage() {
         <div>
           <h2 className="text-xl font-bold text-navy-900">Próximos passos (roadmap)</h2>
           <p className="mt-2 text-sm text-ink-700">
-            O pipeline real cobre hoje os maiores municípios por população, todos os 27 estados e uma amostra da
-            União. A arquitetura já suporta ampliar essa cobertura sem mudar telas.
+            O pipeline real cobre todos os 27 estados e a União em toda execução, e amplia a cobertura de municípios
+            progressivamente a cada `npm run ingest` (os maiores por população primeiro) até cobrir o Brasil inteiro
+            — ver a barra de cobertura acima.
           </p>
           <ul className="mt-4 space-y-2 text-sm text-ink-700">
             {ROADMAP.map((r) => (

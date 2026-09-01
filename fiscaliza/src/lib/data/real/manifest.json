@@ -4,5 +4,7 @@
   "pncp": { "ok": false, "skipped": true },
   "cnpj": { "ok": false, "skipped": true },
   "portalTransparencia": { "ok": false, "skipped": true },
-  "principaisMunicipiosCount": 0
+  "municipiosBatchCount": 0,
+  "municipiosCoveredTotal": 0,
+  "municipiosTotal": 0
 }
