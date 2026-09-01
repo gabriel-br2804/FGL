@@ -45,8 +45,20 @@ const CONCURRENCY = 2;
 const DELAY_BETWEEN_REQUESTS_MS = 700;
 // Quantos contratos (maior valor primeiro) recebem uma segunda chamada
 // para buscar o fornecedor real — cada um custa mais uma requisição ao
-// PNCP, que já está perto do limite de taxa.
-const SUPPLIER_LOOKUP_LIMIT = 40;
+// PNCP, que já está perto do limite de taxa. Reduzido de 40 para 20:
+// numa execução real, a fase principal (88 entidades x 3 modalidades) já
+// esgotava a cota antes mesmo da busca de fornecedor começar, resultando
+// em 429 em 100% das tentativas — menos chamadas + mais espaço entre elas
+// tem mais chance de passar.
+const SUPPLIER_LOOKUP_LIMIT = 20;
+// Intervalo entre cada chamada de /resultados — maior que o das consultas
+// principais porque essa fase roda logo depois de já ter consumido boa
+// parte da cota de requisições da entidade principal.
+const SUPPLIER_DELAY_MS = 2500;
+// Pausa única antes de começar a fase de fornecedor, pra dar um tempo da
+// cota de requisições (por IP, aparentemente por minuto) resetar depois
+// da fase principal.
+const SUPPLIER_PHASE_COOLDOWN_MS = 20_000;
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -143,8 +155,8 @@ function normalizeRecord(raw, scope) {
 async function fetchSupplierForRecord(record) {
   if (!record.agencyCnpj || !record.anoCompra || !record.sequencialCompra) return null;
   const url = `https://pncp.gov.br/api/consulta/v1/orgaos/${record.agencyCnpj}/compras/${record.anoCompra}/${record.sequencialCompra}/resultados`;
-  const res = await fetchJson(url, { label: `PNCP resultados ${record.pncpId}`, retries: 2, retryDelayMs: 2000, timeoutMs: 25_000 });
-  await sleep(DELAY_BETWEEN_REQUESTS_MS);
+  const res = await fetchJson(url, { label: `PNCP resultados ${record.pncpId}`, retries: 2, retryDelayMs: 4000, timeoutMs: 25_000 });
+  await sleep(SUPPLIER_DELAY_MS);
   if (!res.ok) return { error: res.error };
 
   const list = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : null;
@@ -292,6 +304,8 @@ export async function ingestPncp(targets) {
   const resultadosRawSamples = [];
   const resultadosErrors = [];
   if (supplierLookupTargets.length > 0) {
+    console.log(`[ingest] aguardando ${SUPPLIER_PHASE_COOLDOWN_MS / 1000}s antes da busca de fornecedor (dar tempo da cota de requisições do PNCP resetar)...`);
+    await sleep(SUPPLIER_PHASE_COOLDOWN_MS);
     console.log(`[ingest] buscando fornecedor real de ${supplierLookupTargets.length} contrato(s) de município (maior valor primeiro)...`);
     let resolved = 0;
     let processed = 0;
