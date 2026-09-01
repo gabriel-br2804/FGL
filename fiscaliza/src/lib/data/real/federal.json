@@ -3,5 +3,7 @@
   "skipped": true,
   "reason": "not_run",
   "contracts": [],
+  "bids": [],
+  "bidErrors": [],
   "errors": []
 }

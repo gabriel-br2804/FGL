@@ -1,6 +1,7 @@
 /**
  * Ingestão Portal da Transparência (Governo Federal) — cobre a esfera
- * União com mais detalhe do que o PNCP sozinho (despesas, órgãos SIAFI).
+ * União com mais detalhe do que o PNCP sozinho (despesas, órgãos SIAFI, e
+ * agora licitações com número real de participantes).
  *
  * Requer uma chave de API gratuita, pessoal, obtida em:
  *   https://api.portaldatransparencia.gov.br/swagger-ui/index.html
@@ -13,6 +14,16 @@
  *
  * Documentação: https://api.portaldatransparencia.gov.br/swagger-ui/index.html
  * Saída: src/lib/data/real/federal.json
+ *
+ * IMPORTANTE — honestidade sobre confiabilidade: a seção de licitações
+ * (endpoints /licitacoes e /licitacoes/participantes) nunca foi testada
+ * contra a API real nesta sessão. Os parâmetros usados espelham o padrão
+ * já validado do endpoint /contratos deste mesmo conector
+ * (codigoOrgao + pagina), mas o Swagger da API não deixa claro se
+ * /licitacoes exige também um intervalo de datas — se vier erro 400 aqui,
+ * é o primeiro lugar a olhar. É o que dá ao Fiscaliza o número REAL de
+ * participantes de uma licitação federal, em vez do número sorteado que a
+ * base simulada usa.
  */
 import { writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
@@ -46,7 +57,7 @@ export async function ingestPortalTransparencia() {
         "  Obtenha uma chave gratuita em https://api.portaldatransparencia.gov.br/swagger-ui/index.html\n" +
         "  e rode de novo com: PORTAL_TRANSPARENCIA_API_KEY=sua-chave npm run ingest"
     );
-    const payload = { generatedAt: new Date().toISOString(), skipped: true, reason: "missing_api_key", contracts: [] };
+    const payload = { generatedAt: new Date().toISOString(), skipped: true, reason: "missing_api_key", contracts: [], bids: [] };
     await mkdir(OUT_DIR, { recursive: true });
     await writeFile(path.join(OUT_DIR, "federal.json"), JSON.stringify(payload, null, 2));
     return payload;
@@ -55,7 +66,7 @@ export async function ingestPortalTransparencia() {
   const orgaosRes = await apiGet("/orgaos-siafi?pagina=1", apiKey, "Portal Transparência órgãos SIAFI");
   if (!orgaosRes.ok) {
     console.error(`[ingest] não consegui listar órgãos SIAFI (chave inválida? rate limit?): ${orgaosRes.error}`);
-    const payload = { generatedAt: new Date().toISOString(), skipped: true, reason: orgaosRes.error, contracts: [] };
+    const payload = { generatedAt: new Date().toISOString(), skipped: true, reason: orgaosRes.error, contracts: [], bids: [] };
     await mkdir(OUT_DIR, { recursive: true });
     await writeFile(path.join(OUT_DIR, "federal.json"), JSON.stringify(payload, null, 2));
     return payload;
@@ -94,12 +105,68 @@ export async function ingestPortalTransparencia() {
 
   console.log(`[ingest] Portal da Transparência: ${allContracts.length} contrato(s) federais coletados.`);
 
+  // Licitações + participantes reais — dá ao Fiscaliza o número de fato de
+  // participantes de uma licitação federal, em vez do valor sorteado que a
+  // base simulada usa para município/estado (o PNCP não expõe isso).
+  const allBids = [];
+  const bidErrors = [];
+  for (const orgao of matched) {
+    const codigo = orgao.codigo ?? orgao.codigoSIAFI ?? orgao.codigoOrgao;
+    if (!codigo) continue;
+    const res = await apiGet(`/licitacoes?codigoOrgao=${codigo}&pagina=1`, apiKey, `Portal Transparência licitações ${codigo}`);
+    if (!res.ok) {
+      bidErrors.push({ orgao: orgao.descricao ?? orgao.nome, error: res.error });
+      continue;
+    }
+    const list = Array.isArray(res.data) ? res.data : [];
+    for (const item of list) {
+      const id = item.id ?? item.idLicitacao ?? item.licitacao?.id;
+      allBids.push({
+        id,
+        agencyName: orgao.descricao ?? orgao.nome,
+        agencyCode: codigo,
+        number: item.numero ?? item.numeroAviso ?? null,
+        modality: item.modalidadeLicitacao?.descricao ?? item.modalidade ?? null,
+        object: item.objeto ?? item.descricaoObjeto ?? "(objeto não informado)",
+        estimatedValue: Number(item.valor ?? item.valorEstimado) || null,
+        openedAt: item.dataAbertura ?? item.dataResultado ?? null,
+        participantsCount: null,
+      });
+    }
+  }
+
+  // Só busca participantes dos LICITACAO_PARTICIPANTS_LIMIT de maior valor
+  // — cada um custa mais uma chamada à API, que também é rate-limitada.
+  const LICITACAO_PARTICIPANTS_LIMIT = 20;
+  const bidsForParticipants = allBids
+    .filter((b) => b.id != null)
+    .sort((a, b) => (b.estimatedValue ?? 0) - (a.estimatedValue ?? 0))
+    .slice(0, LICITACAO_PARTICIPANTS_LIMIT);
+
+  let participantsResolved = 0;
+  for (const bid of bidsForParticipants) {
+    const res = await apiGet(`/licitacoes/participantes?id=${bid.id}&pagina=1`, apiKey, `Portal Transparência participantes licitação ${bid.id}`);
+    if (!res.ok) {
+      bidErrors.push({ licitacaoId: bid.id, error: res.error });
+      continue;
+    }
+    const list = Array.isArray(res.data) ? res.data : [];
+    bid.participantsCount = list.length;
+    participantsResolved++;
+  }
+
+  console.log(
+    `[ingest] Portal da Transparência: ${allBids.length} licitação(ões) federais coletadas, ${participantsResolved}/${bidsForParticipants.length} com nº real de participantes.`
+  );
+
   const payload = {
     generatedAt: new Date().toISOString(),
     source: "Portal da Transparência — Governo Federal (API de Dados)",
     skipped: false,
     agenciesQueried: matched.map((m) => m.descricao ?? m.nome),
     contracts: allContracts,
+    bids: allBids,
+    bidErrors,
     errors,
   };
   await mkdir(OUT_DIR, { recursive: true });

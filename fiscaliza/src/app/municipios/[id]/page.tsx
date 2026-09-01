@@ -60,7 +60,11 @@ export default function MunicipalityPage({ params }: { params: { id: string } })
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard value={fmtNumber(muni.population)} label="População" />
-        <StatCard value={fmtBRLCompact(muni.annualBudget)} label="Orçamento anual" />
+        <StatCard
+          value={fmtBRLCompact(muni.annualBudget)}
+          label="Orçamento anual"
+          hint={muni.budgetSource === "siconfi" ? "Real · SICONFI" : "Estimativa (MVP)"}
+        />
         <StatCard value={fmtBRLCompact(muni.totalSpent)} label="Gastos analisados" />
         <StatCard value={fmtNumber(muni.totalContracts)} label="Contratos" />
         <StatCard value={fmtNumber(muni.totalSuppliers)} label="Fornecedores" />

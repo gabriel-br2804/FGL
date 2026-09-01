@@ -1,6 +1,4 @@
-import { ScoreBadge } from "./ScoreBadge";
-import { fmtBRLCompact } from "@/lib/engine/format";
-import type { RealStateGovernance, SecretariaDetail } from "@/lib/data";
+import type { RealStateGovernance } from "@/lib/data";
 
 function initials(name: string) {
   return name
@@ -12,16 +10,51 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export function GovernanceSection({
-  governance,
-  secretarias,
-  stateName,
+function LeaderCard({
+  name,
+  party,
+  sourceUrl,
+  role,
+  place,
+  fallback,
 }: {
-  governance?: RealStateGovernance;
-  secretarias: SecretariaDetail[];
-  stateName: string;
+  name: string | null | undefined;
+  party: string | null | undefined;
+  sourceUrl: string | null | undefined;
+  role: string;
+  place: string;
+  fallback: string;
 }) {
+  return (
+    <div className="flex items-center gap-4">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-navy-800 text-lg font-bold text-white">
+        {name ? initials(name) : "?"}
+      </div>
+      <div className="min-w-0">
+        {name ? (
+          <>
+            <div className="font-semibold text-ink-900">{name}</div>
+            <div className="text-xs text-ink-500">
+              {party ?? "Partido não informado"} · {role} de {place}
+            </div>
+            {sourceUrl && (
+              <a href={sourceUrl} target="_blank" rel="noreferrer" className="text-xs font-medium text-signal-blue hover:underline">
+                Ver fonte oficial ↗
+              </a>
+            )}
+          </>
+        ) : (
+          <div className="text-sm text-ink-500">{fallback}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function GovernanceSection({ governance, stateName }: { governance?: RealStateGovernance; stateName: string }) {
   const governor = governance?.governor;
+  const mayor = governance?.capital.mayor;
+  const capitalName = governance?.capital.name;
 
   return (
     <div className="card p-6">
@@ -30,61 +63,23 @@ export function GovernanceSection({
         <span className="badge bg-ink-900/5 text-[10px] text-ink-500">Pesquisado manualmente · fonte por item</span>
       </div>
 
-      <div className="mt-5 flex items-center gap-4">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-navy-800 text-lg font-bold text-white">
-          {governor?.name ? initials(governor.name) : "?"}
-        </div>
-        <div className="min-w-0">
-          {governor?.name ? (
-            <>
-              <div className="font-semibold text-ink-900">{governor.name}</div>
-              <div className="text-xs text-ink-500">
-                {governor.party ?? "Partido não informado"} · Governador(a) de {stateName}
-              </div>
-              {governor.sourceUrl && (
-                <a
-                  href={governor.sourceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs font-medium text-signal-blue hover:underline"
-                >
-                  Ver fonte oficial ↗
-                </a>
-              )}
-            </>
-          ) : (
-            <div className="text-sm text-ink-500">Governador(a) ainda não confirmado(a) nesta base.</div>
-          )}
-        </div>
-      </div>
-
-      <p className="mt-4 text-xs text-ink-500">
-        O Fiscaliza Score de cada secretaria abaixo é calculado a partir dos contratos reais/simulados do estado
-        classificados nessa área de gasto — o nome do(a) secretário(a) é só identificação, não entra no cálculo.
-      </p>
-
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {secretarias.map((s) => (
-          <div key={s.area} className="rounded-xl2 border border-base-border p-4">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-ink-900">{s.label}</div>
-                <div className="truncate text-xs text-ink-500">{s.name ?? "Secretário(a) não confirmado(a)"}</div>
-              </div>
-              <ScoreBadge score={s.score.total} size="sm" />
-            </div>
-            <div className="mt-3 flex items-center justify-between text-xs text-ink-500">
-              <span className="tabular-nums">
-                {fmtBRLCompact(s.totalSpent)} · {s.contractsCount} contrato(s)
-              </span>
-              {s.sourceUrl && (
-                <a href={s.sourceUrl} target="_blank" rel="noreferrer" className="font-medium text-signal-blue hover:underline">
-                  Fonte ↗
-                </a>
-              )}
-            </div>
-          </div>
-        ))}
+      <div className="mt-5 grid gap-6 sm:grid-cols-2">
+        <LeaderCard
+          name={governor?.name}
+          party={governor?.party}
+          sourceUrl={governor?.sourceUrl}
+          role="Governador(a)"
+          place={stateName}
+          fallback="Governador(a) ainda não confirmado(a) nesta base."
+        />
+        <LeaderCard
+          name={mayor?.name}
+          party={mayor?.party}
+          sourceUrl={mayor?.sourceUrl}
+          role="Prefeito(a)"
+          place={capitalName ?? "capital"}
+          fallback={capitalName ? `Prefeito(a) de ${capitalName} ainda não confirmado(a) nesta base.` : "Prefeito(a) da capital ainda não confirmado(a) nesta base."}
+        />
       </div>
     </div>
   );

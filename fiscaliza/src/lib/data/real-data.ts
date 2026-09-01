@@ -13,6 +13,7 @@ import federal from "./real/federal.json";
 import manifest from "./real/manifest.json";
 import companiesReal from "./real/companies.json";
 import governance from "./real/governance.json";
+import siconfi from "./real/siconfi.json";
 import type { SpendingArea } from "../types";
 
 export interface RealMunicipio {
@@ -50,6 +51,19 @@ export const REAL_CONTRACTS = contracts as {
   records: RealContractRecord[];
 };
 
+export interface RealFederalBid {
+  id: string | number | null;
+  agencyName: string | null;
+  agencyCode: string | null;
+  number: string | null;
+  modality: string | null;
+  object: string;
+  estimatedValue: number | null;
+  openedAt: string | null;
+  /** Nº real de participantes vindo de /licitacoes/participantes — null quando não foi consultado (ver LICITACAO_PARTICIPANTS_LIMIT no ingest). */
+  participantsCount: number | null;
+}
+
 export const REAL_FEDERAL = federal as {
   generatedAt: string | null;
   skipped: boolean;
@@ -63,6 +77,8 @@ export const REAL_FEDERAL = federal as {
     supplierCnpj: string | null;
     signedAt: string | null;
   }[];
+  bids?: RealFederalBid[];
+  bidErrors?: unknown[];
 };
 
 export const REAL_MANIFEST = manifest as {
@@ -71,6 +87,7 @@ export const REAL_MANIFEST = manifest as {
   pncp: { ok: boolean; recordsFetched?: number; entitiesQueried?: number; skipped?: boolean };
   cnpj?: { ok: boolean; requested?: number; resolved?: number; skipped?: boolean };
   portalTransparencia: { ok: boolean; contractsFetched?: number; skipped?: boolean; reason?: string };
+  siconfi?: { ok: boolean; entesFetched?: number; referenceYear?: number; skipped?: boolean };
   municipiosBatchCount?: number;
   municipiosCoveredTotal?: number;
   municipiosTotal?: number;
@@ -84,18 +101,45 @@ export interface RealPortalLink {
 
 export interface RealStateGovernance {
   governor: { name: string | null; party: string | null; sourceUrl: string | null };
-  secretarias: { area: SpendingArea; label: string; name: string | null; sourceUrl: string | null }[];
   statePortal: RealPortalLink;
-  capital: { name: string | null; portal: RealPortalLink };
+  capital: {
+    name: string | null;
+    mayor: { name: string | null; party: string | null; sourceUrl: string | null };
+    portal: RealPortalLink;
+  };
 }
 
-/** Governador, secretariado e portais de transparência por estado — pesquisado
- * manualmente com fonte citada por item (não é um ingest automático como
- * IBGE/PNCP). Ver `disclaimer` e `/fontes` no app. */
+/** Governador (com partido), prefeito da capital e portais de transparência
+ * por estado — pesquisado manualmente com fonte citada por item (não é um
+ * ingest automático como IBGE/PNCP). Ver `disclaimer` e `/fontes` no app. */
 export const REAL_GOVERNANCE = governance as {
   asOf: string | null;
   disclaimer: string;
   states: Record<string, RealStateGovernance>;
+};
+
+export interface RealSiconfiRecord {
+  idEnte: string;
+  despesaOrcamentaria: number | null;
+  receitaOrcamentaria: number | null;
+  sphere: "municipio" | "estado";
+}
+
+const siconfiTyped = siconfi as {
+  generatedAt: string | null;
+  source: string | null;
+  referenceYear: number | null;
+  referenceBimester: number | null;
+  records: RealSiconfiRecord[];
+  stats: { municipiosEncontrados: number; estadosEncontrados: number };
+};
+
+/** Orçamento/despesa orçamentária REAL por ente (SICONFI/Tesouro Nacional),
+ * indexado por id_ente (código IBGE do município, ou código de 2 dígitos
+ * da UF para estados) para lookup O(1) em generate.ts. */
+export const REAL_SICONFI = {
+  ...siconfiTyped,
+  byIdEnte: new Map(siconfiTyped.records.map((r) => [String(r.idEnte), r])),
 };
 
 export interface RealCompanyRecord {

@@ -47,6 +47,13 @@ export default function StatePage({ params }: { params: { uf: string } }) {
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard value={fmtNumber(detail.state.population)} label="População" />
+        {detail.state.annualBudget != null && (
+          <StatCard
+            value={fmtBRLCompact(detail.state.annualBudget)}
+            label="Orçamento anual"
+            hint={detail.state.budgetSource === "siconfi" ? "Real · SICONFI" : undefined}
+          />
+        )}
         <StatCard value={fmtBRLCompact(detail.totalSpent)} label="Gastos analisados" />
         <StatCard value={fmtNumber(detail.totalContracts)} label="Contratos" />
         <StatCard value={fmtNumber(detail.totalSuppliers)} label="Fornecedores" />
@@ -63,7 +70,7 @@ export default function StatePage({ params }: { params: { uf: string } }) {
 
       <div className="mt-10 grid gap-8 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <GovernanceSection governance={detail.governance} secretarias={detail.secretarias} stateName={detail.state.name} />
+          <GovernanceSection governance={detail.governance} stateName={detail.state.name} />
         </div>
         <div className="lg:col-span-2">
           <OfficialPortalsCard governance={detail.governance} />

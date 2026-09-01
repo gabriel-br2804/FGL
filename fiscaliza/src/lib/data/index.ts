@@ -191,6 +191,7 @@ export interface RealDataStatus {
   };
   cnpj: { ok: boolean; requested: number; resolved: number };
   portalTransparencia: { ok: boolean; contractsFetched: number; skipped: boolean; reason?: string };
+  siconfi: { ok: boolean; entesFetched: number; referenceYear: number | null };
   generatedAt: string | null;
 }
 
@@ -218,6 +219,11 @@ export function getRealDataStatus(): RealDataStatus {
       contractsFetched: REAL_MANIFEST.portalTransparencia.contractsFetched ?? 0,
       skipped: REAL_MANIFEST.portalTransparencia.skipped ?? true,
       reason: REAL_MANIFEST.portalTransparencia.reason,
+    },
+    siconfi: {
+      ok: REAL_MANIFEST.siconfi?.ok ?? false,
+      entesFetched: REAL_MANIFEST.siconfi?.entesFetched ?? 0,
+      referenceYear: REAL_MANIFEST.siconfi?.referenceYear ?? null,
     },
     generatedAt: REAL_MANIFEST.generatedAt,
   };
@@ -249,6 +255,23 @@ export function getRealFederalStats(): RealScopeStats & { pncpCount: number; por
     totalValue: pncpTotal + ptTotal,
     pncpCount: pncpRecords.length,
     portalTransparenciaCount: REAL_FEDERAL.contracts.length,
+  };
+}
+
+/** Licitações federais reais (Portal da Transparência) com nº real de
+ * participantes — endpoint /licitacoes/participantes, mais detalhado do
+ * que o PNCP consegue dar para município/estado. */
+export function getRealFederalBidStats() {
+  const bids = REAL_FEDERAL.bids ?? [];
+  const withParticipants = bids.filter((b) => b.participantsCount != null);
+  const avgParticipants = withParticipants.length
+    ? withParticipants.reduce((s, b) => s + (b.participantsCount ?? 0), 0) / withParticipants.length
+    : null;
+  return {
+    count: bids.length,
+    withParticipantsCount: withParticipants.length,
+    avgParticipants,
+    lowCompetitionCount: withParticipants.filter((b) => (b.participantsCount ?? 0) <= 1).length,
   };
 }
 
@@ -426,70 +449,11 @@ export function getNationalSpendingHistory() {
   return aggregateSpendingHistory(getDB().municipalities);
 }
 
-/** Governador, secretariado e portais oficiais do estado — dado real, mas
- * pesquisado/curado manualmente (não vem de um ingest automático). Ver
- * `REAL_GOVERNANCE.disclaimer`. */
+/** Governador (com partido), prefeito da capital e portais oficiais do
+ * estado — dado real, mas pesquisado/curado manualmente (não vem de um
+ * ingest automático). Ver `REAL_GOVERNANCE.disclaimer`. */
 export function getStateGovernance(stateId: string): RealStateGovernance | undefined {
   return REAL_GOVERNANCE.states[stateId.toUpperCase()];
-}
-
-export interface SecretariaDetail {
-  area: SpendingArea;
-  label: string;
-  name: string | null;
-  sourceUrl: string | null;
-  totalSpent: number;
-  contractsCount: number;
-  score: FiscalizaScoreBreakdown;
-}
-
-/** Um "Fiscaliza Score" por secretaria (área de gasto), calculado a partir
- * dos contratos reais/simulados do estado na mesma área — mesmo motor de
- * análise usado para município/estado/União, só que recortado por
- * categoria. O nome do secretário (quando disponível) vem de
- * getStateGovernance; o score em si nunca depende dele. */
-export function getStateSecretarias(stateId: string): SecretariaDetail[] {
-  getEnriched();
-  const db = getDB();
-  const contracts = contractsForState(stateId);
-  const governance = getStateGovernance(stateId);
-  const byArea = new Map<SpendingArea, Contract[]>();
-  for (const c of contracts) {
-    const arr = byArea.get(c.category) ?? [];
-    arr.push(c);
-    byArea.set(c.category, arr);
-  }
-  const areas: { area: SpendingArea; label: string }[] = governance?.secretarias.map((s) => ({ area: s.area, label: s.label })) ?? [
-    { area: "Saúde", label: "Secretaria de Saúde" },
-    { area: "Educação", label: "Secretaria de Educação" },
-    { area: "Infraestrutura", label: "Secretaria de Infraestrutura/Obras" },
-    { area: "Segurança", label: "Secretaria de Segurança Pública" },
-    { area: "Administração", label: "Secretaria de Administração/Fazenda" },
-    { area: "Transporte", label: "Secretaria de Transportes" },
-  ];
-
-  return areas.map(({ area, label }) => {
-    const areaContracts = byArea.get(area) ?? [];
-    const areaBids = db.bids.filter((b) => areaContracts.some((c) => c.bidId === b.id));
-    const ageById = new Map<string, number>();
-    for (const companyId of new Set(areaContracts.map((c) => c.companyId))) {
-      const company = db.companyById.get(companyId);
-      if (company) {
-        ageById.set(companyId, (APP_NOW.getTime() - new Date(company.openedAt).getTime()) / (30.44 * 24 * 3600 * 1000));
-      }
-    }
-    const score = scoreAggregate("state", `${stateId}-${area}`, areaContracts, areaBids, ageById);
-    const sec = governance?.secretarias.find((s) => s.area === area);
-    return {
-      area,
-      label,
-      name: sec?.name ?? null,
-      sourceUrl: sec?.sourceUrl ?? null,
-      totalSpent: areaContracts.reduce((s, c) => s + c.currentValue, 0),
-      contractsCount: areaContracts.length,
-      score,
-    };
-  });
 }
 
 /** Visão completa de um estado, para a página /estados/[uf]. */
@@ -505,7 +469,6 @@ export function getStateDetail(stateId: string) {
     projects: projectsForState(stateId),
     contracts: contractsForState(stateId),
     governance: getStateGovernance(stateId),
-    secretarias: getStateSecretarias(stateId),
   };
 }
 
@@ -520,6 +483,7 @@ export function getUniaoDetail() {
     topSuppliers: suppliersForNation(8),
     projects: getDB().projects,
     contracts: getDB().contracts,
+    realFederalBids: getRealFederalBidStats(),
   };
 }
 

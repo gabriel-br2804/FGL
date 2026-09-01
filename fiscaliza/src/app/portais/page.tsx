@@ -27,23 +27,24 @@ export default function PortaisPage() {
         Portais de transparência de estados e capitais
       </h1>
       <p className="mt-4 max-w-2xl text-ink-700">
-        Acesso direto às fontes oficiais dos 27 estados e suas capitais — governador, secretariado e o portal de
-        transparência de cada um. São links para os sites oficiais, pesquisados manualmente com fonte citada por
-        item; o Fiscaliza ainda não importa dados automaticamente da maioria deles (diferente do IBGE e do PNCP, que
-        alimentam o resto do app via <code className="font-mono text-xs">npm run ingest</code>).
+        Acesso direto às fontes oficiais dos 27 estados e suas capitais — governador, prefeito(a) da capital e o
+        portal de transparência de cada um. São links para os sites oficiais, pesquisados manualmente com fonte
+        citada por item; o Fiscaliza ainda não importa dados automaticamente da maioria deles (diferente do IBGE, do
+        PNCP e do SICONFI, que alimentam o resto do app via <code className="font-mono text-xs">npm run ingest</code>).
       </p>
       {REAL_GOVERNANCE.asOf && (
         <p className="mt-2 text-xs text-ink-500">Pesquisa mais recente: {fmtDate(REAL_GOVERNANCE.asOf)}.</p>
       )}
 
       <div className="mt-8 overflow-x-auto rounded-xl2 border border-base-border">
-        <table className="w-full min-w-[880px] text-sm">
+        <table className="w-full min-w-[1040px] text-sm">
           <thead>
             <tr className="border-b border-base-border bg-ink-900/[0.02] text-left text-xs uppercase tracking-wide text-ink-500">
               <th className="px-4 py-3 font-semibold">Estado</th>
               <th className="px-4 py-3 font-semibold">Governador(a)</th>
               <th className="px-4 py-3 font-semibold text-right">Portal do estado</th>
               <th className="px-4 py-3 font-semibold">Capital</th>
+              <th className="px-4 py-3 font-semibold">Prefeito(a)</th>
               <th className="px-4 py-3 font-semibold text-right">Portal da capital</th>
             </tr>
           </thead>
@@ -72,6 +73,16 @@ export default function PortaisPage() {
                     <PortalBadge url={gov?.statePortal.url ?? null} type={gov?.statePortal.type ?? null} />
                   </td>
                   <td className="px-4 py-3 text-ink-700">{gov?.capital.name ?? "—"}</td>
+                  <td className="px-4 py-3 text-ink-700">
+                    {gov?.capital.mayor.name ? (
+                      <>
+                        {gov.capital.mayor.name}
+                        {gov.capital.mayor.party && <span className="text-xs text-ink-400"> · {gov.capital.mayor.party}</span>}
+                      </>
+                    ) : (
+                      <span className="text-ink-400">Não confirmado</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <PortalBadge url={gov?.capital.portal.url ?? null} type={gov?.capital.portal.type ?? null} />
                   </td>

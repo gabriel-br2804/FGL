@@ -10,7 +10,7 @@ import {
   AMENDMENT_REASONS,
 } from "./companies-seed";
 import { rngFor, pick, randInt, randFloat, weighted, hashString } from "./rng";
-import { REAL_GEO, REAL_CONTRACTS, REAL_COMPANIES, classifyCategory, formatCnpj, mapSituacaoCadastral, type RealMunicipio } from "./real-data";
+import { REAL_GEO, REAL_CONTRACTS, REAL_COMPANIES, REAL_SICONFI, classifyCategory, formatCnpj, mapSituacaoCadastral, type RealMunicipio } from "./real-data";
 import { APP_NOW, APP_NOW_MS } from "../now";
 import type {
   Municipality,
@@ -716,16 +716,25 @@ function buildDatabase(): Database {
   // estimativa independente baseada só em população, calculada ANTES da
   // injeção dos contratos reais do PNCP — ou seja, o "gasto analisado"
   // exibido não batia com a soma dos contratos realmente listados na
-  // página do município. annualBudget continua sendo uma estimativa (não
-  // há fonte real de orçamento ainda — ver roadmap do SICONFI), mas nunca
-  // fica abaixo do que foi de fato analisado.
+  // página do município.
   for (const muni of municipalities) {
     const own = contracts.filter((c) => c.municipalityId === muni.id);
     const totalSpent = own.reduce((s, c) => s + c.currentValue, 0);
     muni.totalSpent = totalSpent;
     muni.totalContracts = own.length;
     muni.totalSuppliers = new Set(own.map((c) => c.companyId)).size;
-    muni.annualBudget = Math.max(muni.annualBudget, Math.round(totalSpent / 0.55));
+
+    // Orçamento real (SICONFI/Tesouro Nacional) quando disponível; senão,
+    // estimativa por população — mas nunca abaixo do que foi de fato
+    // analisado.
+    const siconfiMuni = REAL_SICONFI.byIdEnte.get(String(muni.ibgeCode));
+    if (siconfiMuni?.despesaOrcamentaria) {
+      muni.annualBudget = siconfiMuni.despesaOrcamentaria;
+      muni.budgetSource = "siconfi";
+    } else {
+      muni.annualBudget = Math.max(muni.annualBudget, Math.round(totalSpent / 0.55));
+      muni.budgetSource = "estimado";
+    }
 
     const byArea = new Map<SpendingArea, number>();
     for (const c of own) byArea.set(c.category, (byArea.get(c.category) ?? 0) + c.currentValue);
@@ -739,6 +748,18 @@ function buildDatabase(): Database {
     muni.spendingHistory = Array.from(byYear.entries())
       .sort((a, b) => a[0] - b[0])
       .map(([year, value]) => ({ year, value }));
+  }
+
+  // Orçamento estadual real (SICONFI) — id_ente do RREO para estados é o
+  // código IBGE de 2 dígitos da UF (mesmo usado em REAL_GEO.states).
+  const stateIbgeIdByUf = new Map(REAL_GEO.states.map((s) => [s.id, String(s.ibgeId)]));
+  for (const state of states) {
+    const ibgeId = stateIbgeIdByUf.get(state.id);
+    const siconfiEstado = ibgeId ? REAL_SICONFI.byIdEnte.get(ibgeId) : undefined;
+    if (siconfiEstado?.despesaOrcamentaria) {
+      state.annualBudget = siconfiEstado.despesaOrcamentaria;
+      state.budgetSource = "siconfi";
+    }
   }
 
   // Projects ("obras") — derived from Infraestrutura + some Saúde/Educação contracts with higher value

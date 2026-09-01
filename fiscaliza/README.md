@@ -61,7 +61,7 @@ PORTAL_TRANSPARENCIA_API_KEY=xxxx npm run ingest  # inclui União com mais detal
 INGEST_LIMIT=10 npm run ingest                    # teste rápido, lote pequeno de municípios
 ```
 
-O script roda em quatro passos (`scripts/ingest/`):
+O script roda em cinco passos (`scripts/ingest/`):
 
 1. **IBGE** (`ibge.mjs`) — geografia e população reais via API de Localidades/Agregados,
    dos ~5.571 municípios e 27 estados. Sem chave, alta confiança de que funciona de
@@ -90,9 +90,19 @@ O script roda em quatro passos (`scripts/ingest/`):
    anterior à própria abertura. Sequencial e limitado (`CNPJ_ENRICH_LIMIT`, padrão 30)
    porque o endpoint de CNPJ espelha o serviço rate-limitado da Receita Federal.
 4. **Portal da Transparência** (`portalTransparencia.mjs`) — contratos federais com mais
-   detalhe. Precisa de uma chave gratuita pessoal, obtida em
-   https://api.portaldatransparencia.gov.br/swagger-ui/index.html. Sem a chave, esse
-   passo é pulado e a União continua representada pelo que o PNCP trouxer.
+   detalhe, e agora também **licitações federais reais com nº real de participantes**
+   (endpoints `/licitacoes` e `/licitacoes/participantes`) — isso é o que dá ao Fiscaliza
+   um número de participantes de verdade em vez do sorteado que a base simulada usa para
+   município/estado (o PNCP não expõe isso). Precisa de uma chave gratuita pessoal,
+   obtida em https://api.portaldatransparencia.gov.br/swagger-ui/index.html. Sem a
+   chave, esse passo é pulado e a União continua representada pelo que o PNCP trouxer.
+5. **SICONFI** (`siconfi.mjs`) — orçamento e despesa orçamentária REAIS de municípios e
+   estados via API do Tesouro Nacional (RREO, Anexo 01 — Balanço Orçamentário),
+   substituindo a estimativa por população usada no MVP. Sem chave. Consulta sem filtro
+   de ente (paginado) para trazer todos os municípios/estados que reportaram de uma vez,
+   em vez de uma chamada por município. **Esta é a integração menos testada do
+   pipeline** — nunca rodou contra a API real nesta sessão; se vier 0 registros ou erro,
+   cole a saída do terminal para ajuste, como já foi feito com o PNCP.
 
 O resultado é gravado em `src/lib/data/real/*.json` (sempre existem no repo, vazios por
 padrão) e `src/lib/data/generate.ts` mescla automaticamente o que encontrar por cima da
@@ -107,24 +117,20 @@ já que esses ambientes normalmente não têm por que rodar o ingest sozinhos.
 > simulam o formato de resposta dessas APIs — rode `npm run ingest` de verdade e, se
 > algo vier diferente do esperado, cole a saída do terminal para ajuste.
 
-## Governo, secretariado e portais estaduais (`src/lib/data/real/governance.json`)
+## Governador, prefeito da capital e portais estaduais (`src/lib/data/real/governance.json`)
 
-Diferente do IBGE/PNCP, **não existe uma API única** para os portais de transparência
-dos 27 estados e suas capitais — cada um roda numa plataforma diferente, a maioria sem
-API pública. Por isso, governador, secretariado e links dos portais de cada estado são
-pesquisados manualmente (via busca na internet), com a URL da fonte oficial citada por
-item, e vivem em `src/lib/data/real/governance.json` — **não são atualizados por
-`npm run ingest`**. Veja `getStateGovernance`/`getStateSecretarias` em
-`src/lib/data/index.ts`, a seção "Governo do estado" em `/estados/[uf]` e o diretório
-completo em `/portais`.
-
-O Fiscaliza Score de cada secretaria, ao contrário, **é dado real**: calculado a partir
-dos contratos do estado (PNCP + simulados) classificados naquela área de gasto — o nome
-do(a) secretário(a) pesquisado é só identificação e nunca entra no cálculo.
+Diferente do IBGE/PNCP/SICONFI, **não existe uma API única** para os portais de
+transparência dos 27 estados e suas capitais — cada um roda numa plataforma diferente,
+a maioria sem API pública. Por isso, governador (com partido), prefeito(a) da capital e
+links dos portais de cada estado são pesquisados manualmente (via busca na internet),
+com a URL da fonte oficial citada por item, e vivem em
+`src/lib/data/real/governance.json` — **não são atualizados por `npm run ingest`**. Veja
+`getStateGovernance` em `src/lib/data/index.ts`, a seção "Governo do estado" em
+`/estados/[uf]` e o diretório completo em `/portais`.
 
 Onde a pesquisa não encontrou um nome com fonte confiável e sem conflito entre fontes
-(comum em 2026, ano eleitoral, com várias renúncias de governadores para concorrer a
-outros cargos e alta troca de secretariado), o campo fica em branco de propósito — ver
+(comum em 2026, ano eleitoral, com várias renúncias de governadores e prefeitos de
+capital para concorrer a outros cargos), o campo fica em branco de propósito — ver
 `REAL_GOVERNANCE.disclaimer`. Complete/atualize esse arquivo conforme mais pesquisa for
 feita; ele não é gerado automaticamente.
 
@@ -133,10 +139,10 @@ feita; ele não é gerado automaticamente.
 ```
 src/
   app/                 rotas (App Router): home, dashboard, mapa, municípios,
-                        estados/[uf] (com governo/secretariado), uniao, portais
-                        (diretório de transparência estadual/capital), empresas,
-                        contratos, obras, IA, alertas, metodologia, fontes, sobre,
-                        como-funciona, dados, busca, api/*
+                        estados/[uf] (com governador/prefeito da capital), uniao,
+                        portais (diretório de transparência estadual/capital),
+                        empresas, contratos, obras, IA, alertas, metodologia,
+                        fontes, sobre, como-funciona, dados, busca, api/*
   components/          UI compartilhada (cards, tabelas, gráficos, timeline,
                         grafo de relações, mapa em grade do Brasil, chat da IA,
                         widget do Impostômetro)
@@ -147,16 +153,19 @@ src/
     engine/             Fiscaliza Intelligence Engine (score, sinais de risco, formatação)
     connectors/          um conector por fonte oficial de dados
     ia/                  camada de resposta em linguagem natural da Fiscaliza IA
-scripts/ingest/         pipeline real (IBGE, PNCP, BrasilAPI, Portal da Transparência) — `npm run ingest`
+scripts/ingest/         pipeline real (IBGE, PNCP, BrasilAPI, Portal da Transparência,
+                        SICONFI) — `npm run ingest`
 prisma/schema.prisma    modelo de dados de produção (PostgreSQL) — não conectado no MVP
 ```
 
 ## Roadmap além do MVP
 
-- Orçamento e execução orçamentária oficiais por função (SICONFI/Tesouro Nacional),
-  complementando o "onde está investindo" hoje derivado da distribuição dos contratos.
+- Validar a integração do SICONFI contra a API real (nunca testada nesta sessão — ver
+  seção acima) e expandir para orçamento por função (saúde, educação...), não só o
+  total.
 - Ampliar a cobertura do PNCP para além dos maiores municípios por população (hoje um
-  recorte de ~60 + todos os 27 estados + uma amostra federal).
+  recorte de ~60 + todos os 27 estados + uma amostra federal — cresce a cada
+  `npm run ingest`, ver cobertura em `/fontes`).
 - Buscar aditivos e histórico de pagamentos reais por contrato (endpoint de
   atualizações do PNCP), hoje só o valor e o objeto na publicação inicial.
 - Cadastros de sanções (CEIS, CNEP, CEPIM) e TCEs das demais UFs.

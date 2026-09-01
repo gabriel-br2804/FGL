@@ -46,7 +46,7 @@ export default function FontesPage() {
             <span className="text-xs text-ink-500">Última execução: {fmtDate(real.generatedAt)}</span>
           )}
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <StatusPill ok={real.ibge.ok} label={real.ibge.ok ? "IBGE conectado" : "IBGE não executado"} />
             <p className="mt-2 text-xs text-ink-500">
@@ -100,6 +100,14 @@ export default function FontesPage() {
                 : real.portalTransparencia.reason === "missing_api_key"
                 ? "Requer uma chave de API gratuita (ver instruções abaixo)."
                 : "Ainda não executado nesta base."}
+            </p>
+          </div>
+          <div>
+            <StatusPill ok={real.siconfi.ok} label={real.siconfi.ok ? "SICONFI conectado" : "SICONFI não executado"} />
+            <p className="mt-2 text-xs text-ink-500">
+              {real.siconfi.ok
+                ? `${real.siconfi.entesFetched} ente(s) com orçamento/despesa real do exercício ${real.siconfi.referenceYear}.`
+                : "Orçamento anual ainda é estimativa baseada em população."}
             </p>
           </div>
         </div>
@@ -165,9 +173,9 @@ export default function FontesPage() {
             consulta ou processa, apenas um contador de arrecadação em tempo real de terceiros.
           </p>
           <p className="mt-4 text-sm text-ink-700">
-            Cada página de estado também traz governador, secretariado e Fiscaliza Score por secretaria (a partir dos
-            contratos reais/simulados classificados por área) — dado pesquisado manualmente, não vindo de um ingest
-            automático. Veja o diretório completo com os 27 estados e capitais em{" "}
+            Cada página de estado também traz governador (com partido) e prefeito(a) da capital — dado pesquisado
+            manualmente, não vindo de um ingest automático. Veja o diretório completo com os 27 estados e capitais
+            em{" "}
             <Link href="/portais" className="font-medium text-signal-blue hover:underline">
               /portais
             </Link>

@@ -27,6 +27,7 @@ import { ingestIbge } from "./ibge.mjs";
 import { ingestPncp } from "./pncp.mjs";
 import { ingestPortalTransparencia } from "./portalTransparencia.mjs";
 import { ingestCnpj } from "./cnpj.mjs";
+import { ingestSiconfi } from "./siconfi.mjs";
 import { logSection } from "./lib/http.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -72,7 +73,7 @@ async function main() {
 
   if (geo.municipalities.length === 0) {
     console.error("[ingest] sem municípios do IBGE — abortando PNCP (não há o que consultar). Verifique sua conexão e rode de novo.");
-    return writeManifest({ geo, pncp: null, cnpj: null, federal: null, batchCount: 0, municipiosCoveredTotal: 0, municipiosTotal: 0 });
+    return writeManifest({ geo, pncp: null, cnpj: null, federal: null, siconfi: null, batchCount: 0, municipiosCoveredTotal: 0, municipiosTotal: 0 });
   }
 
   const progress = await loadProgress();
@@ -92,12 +93,14 @@ async function main() {
   console.log(`[ingest] cobertura PNCP após esta execução: ${coveredAfter}/${geo.municipalities.length} município(s) já consultados pelo menos uma vez.`);
   const cnpj = await ingestCnpj(pncp);
   const federal = await ingestPortalTransparencia();
+  const siconfi = await ingestSiconfi();
 
   await writeManifest({
     geo,
     pncp,
     cnpj,
     federal,
+    siconfi,
     batchCount: batch.length,
     municipiosCoveredTotal: coveredAfter,
     municipiosTotal: geo.municipalities.length,
@@ -108,10 +111,11 @@ async function main() {
   console.log(`PNCP:                 ${pncp.stats.recordsFetched} registros reais (${pncp.stats.entitiesWithErrors} entidades com erro)`);
   console.log(`BrasilAPI (CNPJ):     ${cnpj.stats.resolved}/${cnpj.stats.requested} empresas enriquecidas com dados da Receita Federal`);
   console.log(`Portal Transparência: ${federal.skipped ? "pulado (" + federal.reason + ")" : federal.contracts.length + " contratos federais"}`);
+  console.log(`SICONFI:              ${siconfi.records.length} ente(s) com orçamento/despesa real (exercício ${siconfi.referenceYear})`);
   console.log(`\nPronto. Rode "npm run dev" e confira /fontes para ver o status de cada fonte.`);
 }
 
-async function writeManifest({ geo, pncp, cnpj, federal, batchCount, municipiosCoveredTotal, municipiosTotal }) {
+async function writeManifest({ geo, pncp, cnpj, federal, siconfi, batchCount, municipiosCoveredTotal, municipiosTotal }) {
   await mkdir(OUT_DIR, { recursive: true });
   const manifest = {
     generatedAt: new Date().toISOString(),
@@ -128,6 +132,9 @@ async function writeManifest({ geo, pncp, cnpj, federal, batchCount, municipiosC
       ? federal.skipped
         ? { ok: false, skipped: true, reason: federal.reason }
         : { ok: federal.contracts.length > 0, contractsFetched: federal.contracts.length }
+      : { ok: false, skipped: true },
+    siconfi: siconfi
+      ? { ok: siconfi.records.length > 0, entesFetched: siconfi.records.length, referenceYear: siconfi.referenceYear }
       : { ok: false, skipped: true },
     // Batch desta execução + cobertura acumulada de todas as execuções de
     // `npm run ingest` já rodadas (ver pncp-progress.json) — usado em

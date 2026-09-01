@@ -55,6 +55,16 @@ export default function UniaoPage() {
         </div>
       )}
 
+      {detail.realFederalBids.count > 0 && (
+        <div className="mt-4 rounded-xl2 bg-signal-greenBg p-4 text-sm text-signal-green">
+          <strong>{fmtNumber(detail.realFederalBids.count)}</strong> licitação(ões) federais reais identificadas (Portal
+          da Transparência)
+          {detail.realFederalBids.withParticipantsCount > 0
+            ? ` — ${detail.realFederalBids.withParticipantsCount} com nº real de participantes (média de ${detail.realFederalBids.avgParticipants?.toFixed(1)}, ${detail.realFederalBids.lowCompetitionCount} com apenas 1 participante).`
+            : "."}
+        </div>
+      )}
+
       <div className="mt-12 grid gap-8 lg:grid-cols-5">
         <div className="space-y-8 lg:col-span-3">
           <div className="card p-6">

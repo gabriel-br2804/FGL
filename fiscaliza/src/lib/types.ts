@@ -55,6 +55,9 @@ export interface State {
   name: string;
   region: string;
   population: number;
+  annualBudget?: number; // despesa orçamentária anual (R$) — real via SICONFI, quando disponível
+  /** "siconfi" quando o orçamento vem do Tesouro Nacional (RREO); ausente/"estimado" quando é aproximação do MVP. */
+  budgetSource?: "siconfi" | "estimado";
 }
 
 export interface Municipality {
@@ -75,6 +78,8 @@ export interface Municipality {
   lon: number;
   /** "ibge" quando a população vem da ingestão real do IBGE; ausente/"estimado" quando é uma aproximação do MVP. */
   populationSource?: "ibge" | "estimado";
+  /** "siconfi" quando annualBudget vem do Tesouro Nacional (RREO); ausente/"estimado" quando é aproximação por população. */
+  budgetSource?: "siconfi" | "estimado";
 }
 
 export type SpendingArea =
